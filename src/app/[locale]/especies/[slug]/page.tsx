@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, MapPin, BookOpen, Leaf, Bug, FlaskConical, Thermometer } from "lucide-react";
 import { PLACEHOLDER_SPECIES, STATUS_META, type ConservationStatus } from "@/lib/placeholder/species";
 import SpeciesGallery from "@/components/species/SpeciesGallery";
+import SpeciesMap from "@/components/species/SpeciesMap";
 
 export function generateStaticParams() {
   const locales = ["es", "en"];
@@ -118,6 +119,17 @@ export default async function SpeciesDetailPage({
                 {species.behavior}
               </p>
             </Section>
+
+            {/* Distribution Map */}
+            {species.mexicoLocations && species.mexicoLocations.length > 0 && (
+              <Section icon={<MapPin size={16} />} label="Registros en México">
+                <SpeciesMap
+                  locations={species.mexicoLocations}
+                  highlightedStates={species.mexicoStates}
+                  scientificName={species.scientificName}
+                />
+              </Section>
+            )}
 
             {/* Plantas hospederas */}
             <Section icon={<Leaf size={16} />} label="Plantas hospederas">

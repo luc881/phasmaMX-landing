@@ -1,5 +1,14 @@
 export type ConservationStatus = "LC" | "NT" | "VU" | "EN" | "CR" | "NE" | "DD";
 
+export interface SpeciesLocation {
+  municipality: string;
+  state: string;
+  coords: [number, number]; // [longitude, latitude]
+  date?: string;
+  collector?: string;
+  note?: string;
+}
+
 export interface SpeciesPlaceholder {
   id: string;
   slug: string;
@@ -17,6 +26,8 @@ export interface SpeciesPlaceholder {
   geographicOrigin: string;
   presenceInMexico: boolean;
   mexicoStates: string[];
+  /** Registered locations in Mexico for the map */
+  mexicoLocations?: SpeciesLocation[];
   image: string;
   gallery: { src: string; caption: string; credit: string }[];
   aspectRatio: string; // e.g. "3/4", "4/5", "1/1"
@@ -75,6 +86,10 @@ export const PLACEHOLDER_SPECIES: SpeciesPlaceholder[] = [
     geographicOrigin: "India · Sri Lanka",
     presenceInMexico: false,
     mexicoStates: [],
+    mexicoLocations: [
+      { municipality: "Xalapa", state: "Veracruz", coords: [-96.9269, 19.5438], date: "2023-09", collector: "M. Vidal", note: "Registro en colección entomológica UNAM" },
+      { municipality: "Oaxaca de Juárez", state: "Oaxaca", coords: [-96.7266, 17.0669], date: "2022-11", collector: "L. Herrera", note: "Espécimen de referencia IIB-UNAM" },
+    ],
     image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=85&fit=crop&crop=center",
     aspectRatio: "3/4",
     tags: ["exótica", "cultivo", "partenogénesis"],
@@ -306,6 +321,11 @@ export const PLACEHOLDER_SPECIES: SpeciesPlaceholder[] = [
     geographicOrigin: "México · Centroamérica",
     presenceInMexico: true,
     mexicoStates: ["Veracruz", "Oaxaca", "Chiapas", "Tabasco"],
+    mexicoLocations: [
+      { municipality: "San Andrés Tuxtla", state: "Veracruz", coords: [-95.2131, 18.4504], date: "2024-02", collector: "M. Vidal", note: "Primer registro documentado — Sierra de los Tuxtlas" },
+      { municipality: "Puerto Escondido", state: "Oaxaca", coords: [-97.0736, 15.8585], date: "2023-08", collector: "C. Mendoza", note: "Bosque mesófilo — Colecta nocturna" },
+      { municipality: "Palenque", state: "Chiapas", coords: [-91.9792, 17.5157], date: "2023-11", collector: "S. Ramírez", note: "Selva alta perennifolia" },
+    ],
     image: "https://images.unsplash.com/photo-1560719887-fe3105fa1e55?w=800&q=85&fit=crop&crop=center",
     aspectRatio: "4/5",
     tags: ["nativa", "México", "selva tropical"],
@@ -343,6 +363,11 @@ export const PLACEHOLDER_SPECIES: SpeciesPlaceholder[] = [
     geographicOrigin: "México · Estados Unidos",
     presenceInMexico: true,
     mexicoStates: ["Chihuahua", "Sonora", "Coahuila", "Nuevo León", "Tamaulipas", "San Luis Potosí"],
+    mexicoLocations: [
+      { municipality: "Creel", state: "Chihuahua", coords: [-107.6364, 27.7497], date: "2023-07", collector: "J. Álvarez", note: "Bosque de pino-encino — Sierra Tarahumara" },
+      { municipality: "Linares", state: "Nuevo León", coords: [-99.5664, 24.8597], date: "2022-09", collector: "M. Vidal", note: "Matorral submontano" },
+      { municipality: "Ciudad Victoria", state: "Tamaulipas", coords: [-99.1404, 23.7369], date: "2021-10", collector: "L. Herrera", note: "Colecta lumínica nocturna" },
+    ],
     image: "https://images.unsplash.com/photo-1510784722466-f2aa240af4cf?w=800&q=85&fit=crop&crop=center",
     aspectRatio: "3/4",
     tags: ["nativa", "México", "bosques templados", "norte"],
@@ -379,6 +404,9 @@ export const PLACEHOLDER_SPECIES: SpeciesPlaceholder[] = [
     geographicOrigin: "Centroamérica · Panamá",
     presenceInMexico: true,
     mexicoStates: ["Chiapas"],
+    mexicoLocations: [
+      { municipality: "Tapachula", state: "Chiapas", coords: [-92.2637, 14.9003], date: "2023-05", collector: "C. Mendoza", note: "Registro límite norte de distribución" },
+    ],
     image: "https://images.unsplash.com/photo-1511497584788-876760111969?w=800&q=85&fit=crop&crop=center",
     aspectRatio: "1/1",
     tags: ["nativa", "centroamérica", "selva"],
