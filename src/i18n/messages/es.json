@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "species": "Especies",
+    "articles": "Artículos",
+    "expeditions": "Expediciones",
+    "publications": "Publicaciones",
+    "about": "Acerca de",
+    "catalog": "Catálogo completo"
+  },
+  "hero": {
+    "tagline": "El archivo definitivo de Phasmatodea en México y América Latina",
+    "cta": "Explorar catálogo",
+    "scroll": "Desplazar"
+  },
+  "sections": {
+    "featured_species": "Especies destacadas",
+    "what_are_phasmids": "Qué son los fásmidos",
+    "latest_articles": "Últimos artículos",
+    "distribution": "Distribución en México",
+    "explore_catalog": "Catálogo de especies"
+  },
+  "phasmids": {
+    "intro_title": "Maestros del camuflaje",
+    "intro_body": "Los fásmidos (orden Phasmatodea) son insectos herbívoros conocidos por su extraordinaria capacidad de mimetismo con ramas, hojas y corteza. Con más de 3,500 especies descritas en el mundo, México alberga una diversidad excepcional de formas, tamaños y comportamientos aún poco documentados.",
+    "intro_body_2": "Phasma MX nace como archivo científico de referencia para biólogos, entusiastas y conservacionistas, con énfasis en la fauna nativa de México, Centroamérica y las especies exóticas de interés taxonómico.",
+    "stat_species_world": "especies descritas en el mundo",
+    "stat_species_mx": "especies registradas en México",
+    "stat_endemic": "taxa endémicos"
+  },
+  "species_card": {
+    "family": "Familia",
+    "origin": "Origen",
+    "habitat": "Hábitat",
+    "status": "Estado de conservación",
+    "view": "Ver especie"
+  },
+  "articles": {
+    "read": "Leer artículo",
+    "by": "Por",
+    "published": "Publicado"
+  },
+  "distribution": {
+    "title": "Distribución geográfica",
+    "subtitle": "Registros de fásmidos en México por estado",
+    "placeholder": "Mapa interactivo disponible próximamente"
+  },
+  "cta": {
+    "catalog_title": "Catálogo de especies",
+    "catalog_body": "Accede al registro completo de especies nativas, exóticas y endémicas con fichas taxonómicas, fotografías de campo y referencias bibliográficas.",
+    "catalog_btn": "Ver todas las especies",
+    "publications_btn": "Publicaciones científicas"
+  },
+  "footer": {
+    "description": "Archivo científico de referencia sobre Phasmatodea en México y América Latina.",
+    "rights": "Todos los derechos reservados.",
+    "credits": "Fotografías y datos de campo por colaboradores del proyecto."
+  },
+  "locale": {
+    "switch": "English"
+  }
+}

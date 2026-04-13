@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "species": "Species",
+    "articles": "Articles",
+    "expeditions": "Expeditions",
+    "publications": "Publications",
+    "about": "About",
+    "catalog": "Full catalog"
+  },
+  "hero": {
+    "tagline": "The definitive archive of Phasmatodea in Mexico and Latin America",
+    "cta": "Explore catalog",
+    "scroll": "Scroll"
+  },
+  "sections": {
+    "featured_species": "Featured species",
+    "what_are_phasmids": "What are phasmids",
+    "latest_articles": "Latest articles",
+    "distribution": "Distribution in Mexico",
+    "explore_catalog": "Species catalog"
+  },
+  "phasmids": {
+    "intro_title": "Masters of camouflage",
+    "intro_body": "Phasmids (order Phasmatodea) are herbivorous insects known for their extraordinary mimicry of sticks, leaves and bark. With over 3,500 described species worldwide, Mexico harbors an exceptional diversity of forms, sizes and behaviors still poorly documented.",
+    "intro_body_2": "Phasma MX was created as a scientific reference archive for biologists, enthusiasts and conservationists, with emphasis on native fauna from Mexico, Central America and exotic species of taxonomic interest.",
+    "stat_species_world": "species described worldwide",
+    "stat_species_mx": "species recorded in Mexico",
+    "stat_endemic": "endemic taxa"
+  },
+  "species_card": {
+    "family": "Family",
+    "origin": "Origin",
+    "habitat": "Habitat",
+    "status": "Conservation status",
+    "view": "View species"
+  },
+  "articles": {
+    "read": "Read article",
+    "by": "By",
+    "published": "Published"
+  },
+  "distribution": {
+    "title": "Geographic distribution",
+    "subtitle": "Phasmid records in Mexico by state",
+    "placeholder": "Interactive map coming soon"
+  },
+  "cta": {
+    "catalog_title": "Species catalog",
+    "catalog_body": "Access the complete registry of native, exotic and endemic species with taxonomic sheets, field photographs and bibliographic references.",
+    "catalog_btn": "View all species",
+    "publications_btn": "Scientific publications"
+  },
+  "footer": {
+    "description": "Scientific reference archive on Phasmatodea in Mexico and Latin America.",
+    "rights": "All rights reserved.",
+    "credits": "Field photographs and data by project contributors."
+  },
+  "locale": {
+    "switch": "Español"
+  }
+}
