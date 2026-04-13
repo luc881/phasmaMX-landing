@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Phasma MX
 
-## Getting Started
+Archivo científico de referencia para el orden Phasmatodea (insectos palo) en México y América Latina. Sitio editorial bilingüe (ES/EN) construido con Next.js 15, Sanity CMS y diseño oscuro tipográfico.
 
-First, run the development server:
+## Stack
+
+- **Next.js 15** — App Router, React 19, TypeScript
+- **Tailwind CSS** — Sistema de diseño personalizado con tokens de color
+- **Sanity v3** — CMS headless para especies, artículos, expediciones y publicaciones
+- **next-intl v4** — Rutas bilingües `/es` y `/en`
+- **GSAP + ScrollTrigger** — Animaciones editoriales en scroll
+- **Lucide React** — Sistema de íconos
+
+## Estructura del proyecto
+
+```
+phasmex/
+├── design-system/        # Especificaciones de diseño (tipografía, color, componentes)
+├── sanity/
+│   └── schemas/          # Esquemas CMS: species, article, expedition, publication, author
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx    # Layout raíz con fuentes y metadata
+│   │   └── [locale]/     # Rutas localizadas (es/en)
+│   ├── components/
+│   │   ├── layout/       # Header, Footer
+│   │   └── sections/     # Hero, FeaturedSpecies, PhasmidsIntro, LatestArticles, CatalogCTA
+│   ├── i18n/             # Configuración next-intl, mensajes ES/EN
+│   └── lib/sanity/       # Cliente, image builder, queries GROQ
+└── middleware.ts         # Redirección de rutas por idioma
+```
+
+## Instalación
+
+```bash
+npm install
+```
+
+Copia las variables de entorno:
+
+```bash
+cp .env.example .env.local
+```
+
+Configura `.env.local`:
+
+```env
+NEXT_PUBLIC_SANITY_PROJECT_ID=tu-project-id
+NEXT_PUBLIC_SANITY_DATASET=production
+SANITY_API_TOKEN=tu-token
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+Inicia el servidor de desarrollo:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000) — redirige automáticamente a `/es`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Sanity Studio
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Para acceder al CMS en desarrollo:
 
-## Learn More
+```bash
+npx sanity dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+O visita `/studio` si está configurado como ruta embebida.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Secciones del homepage
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Sección | Descripción |
+|---|---|
+| `Hero` | Imagen full-screen con animación GSAP y parallax |
+| `FeaturedSpecies` | Grid 3×2 de especímenes con cards hover |
+| `PhasmidsIntro` | Texto editorial + estadísticas + imagen con parallax |
+| `LatestArticles` | Artículo destacado + lista lateral |
+| `CatalogCTA` | Llamada a acción con stats del catálogo |
 
-## Deploy on Vercel
+## Tipografía
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Cormorant Garamond** — Títulos display
+- **DM Sans** — Texto UI y cuerpo
+- **Space Mono** — Nombres científicos y etiquetas taxonómicas
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Colores principales
+
+| Token | Valor | Uso |
+|---|---|---|
+| `void` | `#0A0A0A` | Fondo principal |
+| `surface` | `#111111` | Cards y superficies |
+| `gold` | `#C8B97A` | Acento, nombres científicos |
+| `text1` | `#F0EBE0` | Títulos |
+| `text2` | `#B8B0A0` | Cuerpo de texto |
+| `text3` | `#6B6560` | Subtítulos y metadata |
