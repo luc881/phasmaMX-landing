@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ArrowUpRight, Home, BookOpen, Bug } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import gsap from "gsap";
 
 export default function NotFound() {
+  const t = useTranslations("not_found");
   const containerRef = useRef<HTMLDivElement>(null);
   const codeRef = useRef<HTMLSpanElement>(null);
 
@@ -49,28 +51,27 @@ export default function NotFound() {
             <div className="nf-line h-px bg-gold mb-8" />
 
             <p className="font-mono text-caption text-gold uppercase tracking-widest mb-4">
-              Phasmatodea · Página no encontrada
+              {t("label")}
             </p>
 
             <h1 className="nf-title font-display text-display-md font-light text-text1 mb-6 text-balance">
-              Esta especie no está en el catálogo
+              {t("title")}
             </h1>
 
             <p className="nf-body font-sans text-body-lg text-text2 leading-relaxed mb-12 max-w-lg">
-              La página que buscas no existe o ha sido movida. Quizás el espécimen
-              fue reclasificado, o simplemente está pendiente de documentación.
+              {t("body")}
             </p>
 
             {/* Navigation links */}
             <div className="space-y-3">
               <p className="font-mono text-caption text-text3 uppercase tracking-widest mb-5">
-                Continúa explorando
+                {t("nav_title")}
               </p>
 
               {[
-                { href: "/es", label: "Inicio", sub: "Página principal del archivo", icon: <Home size={14} /> },
-                { href: "/es/especies", label: "Catálogo de especies", sub: "240+ fásmidos documentados", icon: <Bug size={14} /> },
-                { href: "/es/articulos", label: "Artículos", sub: "Expediciones, taxonomía y divulgación", icon: <BookOpen size={14} /> },
+                { href: "/",         label: t("link_home"),    sub: t("link_home_sub"),    icon: <Home size={14} /> },
+                { href: "/especies", label: t("link_catalog"),  sub: t("link_catalog_sub"), icon: <Bug size={14} /> },
+                { href: "/articulos",label: t("link_articles"), sub: t("link_articles_sub"),icon: <BookOpen size={14} /> },
               ].map(({ href, label, sub, icon }) => (
                 <Link
                   key={href}
@@ -98,7 +99,7 @@ export default function NotFound() {
 
             {/* Taxonomic decoration */}
             <p className="font-mono text-caption text-text3 mt-10 opacity-40">
-              Orden Phasmatodea · Error 404 · Registro no encontrado
+              {t("footer_note")}
             </p>
           </div>
         </div>

@@ -1,14 +1,20 @@
 import { setRequestLocale } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import CatalogGrid from "@/components/catalog/CatalogGrid";
 
 export function generateStaticParams() {
   return [{ locale: "es" }, { locale: "en" }];
 }
 
-export const metadata = {
-  title: "Catálogo de especies — Phasma MX",
-  description: "Archivo sistemático de Phasmatodea: especies nativas, exóticas y endémicas con fichas taxonómicas completas.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "catalog" });
+  return {
+    title: `${t("title_start")} ${t("title_em")} — Phasma MX`,
+    description: t("description"),
+  };
+}
 
 export default async function EspeciesPage({
   params,
@@ -17,6 +23,7 @@ export default async function EspeciesPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "catalog" });
 
   return (
     <div className="min-h-screen">
@@ -24,29 +31,27 @@ export default async function EspeciesPage({
       <header className="border-b border-border">
         <div className="container-site pt-32 pb-16">
           <p className="font-mono text-caption text-text3 uppercase tracking-widest mb-4">
-            Phasmatodea · Catálogo sistemático
+            {t("label")}
           </p>
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
             <div>
               <h1 className="font-display text-display-lg font-light text-text1 mb-4">
-                Catálogo de{" "}
+                {t("title_start")}{" "}
                 <em className="italic text-gold" style={{ fontStyle: "italic" }}>
-                  especies
+                  {t("title_em")}
                 </em>
               </h1>
               <p className="font-sans text-body-lg text-text2 max-w-2xl leading-relaxed">
-                Registro sistemático de fásmidos con fichas taxonómicas, fotografías de campo
-                y referencias bibliográficas. Incluye especies nativas de México, exóticas de
-                interés científico y taxa endémicos.
+                {t("description")}
               </p>
             </div>
 
-            {/* Stats rápidos */}
+            {/* Stats */}
             <div className="flex gap-8 shrink-0">
               {[
-                ["240+", "Especies"],
-                ["120+", "Nativas MX"],
-                ["6", "Familias"],
+                ["240+", t("stat_species")],
+                ["120+", t("stat_native")],
+                ["6", t("stat_families")],
               ].map(([val, label]) => (
                 <div key={label} className="text-center">
                   <p className="font-display text-display-md font-light text-gold">{val}</p>
@@ -65,18 +70,17 @@ export default async function EspeciesPage({
       <section className="border-t border-border">
         <div className="container-site py-20 text-center">
           <p className="font-mono text-caption text-text3 uppercase tracking-widest mb-4">
-            ¿Conoces una especie no registrada?
+            {t("contribute_label")}
           </p>
           <h2 className="font-display text-display-sm font-light text-text1 mb-6">
-            Contribuye al archivo
+            {t("contribute_title")}
           </h2>
           <p className="font-sans text-body-md text-text2 max-w-lg mx-auto mb-8">
-            Si tienes registros fotográficos, datos de campo o publicaciones sobre fásmidos
-            en México o América Latina, contáctanos para colaborar.
+            {t("contribute_body")}
           </p>
-          <a href="/es/colaborar" className="btn-outline">
-            Cómo colaborar
-          </a>
+          <Link href="/colaborar" className="btn-outline">
+            {t("contribute_btn")}
+          </Link>
         </div>
       </section>
     </div>

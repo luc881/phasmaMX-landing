@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowLeft, MapPin, BookOpen, Leaf, Bug, FlaskConical, Thermometer } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { PLACEHOLDER_SPECIES, STATUS_META, type ConservationStatus } from "@/lib/placeholder/species";
 import SpeciesGallery from "@/components/species/SpeciesGallery";
 import SpeciesMap from "@/components/species/SpeciesMap";
@@ -14,12 +14,13 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string; locale: string }> }) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const species = PLACEHOLDER_SPECIES.find((s) => s.slug === slug);
   if (!species) return { title: "Especie no encontrada — Phasma MX" };
+  const commonName = locale === "en" && species.commonNameEn ? species.commonNameEn : species.commonNameEs;
   return {
     title: `${species.scientificName} — Phasma MX`,
-    description: species.description.slice(0, 155),
+    description: `${commonName}. ${species.description.slice(0, 120)}`,
   };
 }
 
@@ -34,7 +35,13 @@ export default async function SpeciesDetailPage({
   const species = PLACEHOLDER_SPECIES.find((s) => s.slug === slug);
   if (!species) notFound();
 
+  const t = await getTranslations({ locale, namespace: "species_detail" });
   const statusMeta = STATUS_META[species.conservationStatus as ConservationStatus];
+  const commonName = locale === "en" && species.commonNameEn ? species.commonNameEn : species.commonNameEs;
+
+  const relatedSpecies = PLACEHOLDER_SPECIES.filter(
+    (s) => s.family === species.family && s.id !== species.id
+  ).slice(0, 3);
 
   return (
     <div className="min-h-screen">
@@ -42,24 +49,23 @@ export default async function SpeciesDetailPage({
       <section className="relative h-[80vh] min-h-[560px] flex items-end overflow-hidden">
         <Image
           src={species.image}
-          alt={`${species.scientificName} — ${species.commonNameEs}`}
+          alt={`${species.scientificName} — ${commonName}`}
           fill
           priority
           quality={90}
           className="object-cover"
           sizes="100vw"
         />
-        {/* Gradients */}
         <div className="absolute inset-0 bg-gradient-to-t from-void via-void/50 to-void/10" />
         <div className="absolute inset-0 bg-gradient-to-r from-void/60 via-transparent to-transparent" />
 
         {/* Back link */}
         <Link
-          href="/es/especies"
+          href="/especies"
           className="absolute top-24 left-6 lg:left-16 flex items-center gap-2 font-mono text-caption text-text2 hover:text-gold transition-colors duration-300 z-10 bg-void/60 px-3 py-2 backdrop-blur-sm"
         >
           <ArrowLeft size={13} />
-          Catálogo
+          {t("back")}
         </Link>
 
         {/* Catalog number */}
@@ -77,7 +83,7 @@ export default async function SpeciesDetailPage({
               {species.scientificName}
             </h1>
             <p className="font-sans text-body-xl text-text2 mb-2">
-              {species.commonNameEs}
+              {commonName}
             </p>
             <p className="font-mono text-caption text-text3">
               {species.author}
@@ -94,24 +100,24 @@ export default async function SpeciesDetailPage({
           <div className="lg:col-span-7 space-y-16">
 
             {/* Description */}
-            <Section icon={<Bug size={16} />} label="Descripción general">
+            <Section icon={<Bug size={16} />} label={t("description")}>
               <p className="font-sans text-body-lg text-text2 leading-relaxed">
                 {species.description}
               </p>
             </Section>
 
-            {/* Morfología */}
-            <Section icon={<FlaskConical size={16} />} label="Morfología">
+            {/* Morphology */}
+            <Section icon={<FlaskConical size={16} />} label={t("morphology")}>
               <div className="space-y-8">
-                <MorphCard title="Hembras" content={species.females} />
-                <MorphCard title="Machos" content={species.males} />
-                <MorphCard title="Ninfas" content={species.nymphs} />
-                <MorphCard title="Huevos" content={species.eggs} />
+                <MorphCard title={t("females")} content={species.females} />
+                <MorphCard title={t("males")} content={species.males} />
+                <MorphCard title={t("nymphs")} content={species.nymphs} />
+                <MorphCard title={t("eggs")} content={species.eggs} />
               </div>
             </Section>
 
-            {/* Hábitat */}
-            <Section icon={<Leaf size={16} />} label="Hábitat y comportamiento">
+            {/* Habitat */}
+            <Section icon={<Leaf size={16} />} label={t("habitat")}>
               <p className="font-sans text-body-lg text-text2 leading-relaxed mb-6">
                 {species.habitat}
               </p>
@@ -122,7 +128,7 @@ export default async function SpeciesDetailPage({
 
             {/* Distribution Map */}
             {species.mexicoLocations && species.mexicoLocations.length > 0 && (
-              <Section icon={<MapPin size={16} />} label="Registros en México">
+              <Section icon={<MapPin size={16} />} label={t("records_label")}>
                 <SpeciesMap
                   locations={species.mexicoLocations}
                   highlightedStates={species.mexicoStates}
@@ -131,8 +137,8 @@ export default async function SpeciesDetailPage({
               </Section>
             )}
 
-            {/* Plantas hospederas */}
-            <Section icon={<Leaf size={16} />} label="Plantas hospederas">
+            {/* Food plants */}
+            <Section icon={<Leaf size={16} />} label={t("food_plants")}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {species.foodPlants.map((plant, i) => (
                   <div
@@ -147,12 +153,12 @@ export default async function SpeciesDetailPage({
                 ))}
               </div>
               <p className="font-mono text-caption text-text3 mt-3">
-                Lista basada en datos de cultivo. Las plantas marcadas con nombre científico son las preferidas en campo.
+                {t("food_plants_note")}
               </p>
             </Section>
 
-            {/* Cría en cautiverio */}
-            <Section icon={<Thermometer size={16} />} label="Cría en cautiverio">
+            {/* Breeding */}
+            <Section icon={<Thermometer size={16} />} label={t("breeding")}>
               <div className="border border-border bg-surface p-6">
                 <p className="font-sans text-body-md text-text2 leading-relaxed">
                   {species.breeding}
@@ -162,13 +168,13 @@ export default async function SpeciesDetailPage({
 
             {/* Gallery */}
             {species.gallery.length > 0 && (
-              <Section icon={null} label="Galería fotográfica">
+              <Section icon={null} label={t("gallery")}>
                 <SpeciesGallery images={species.gallery} />
               </Section>
             )}
 
             {/* References */}
-            <Section icon={<BookOpen size={16} />} label="Bibliografía">
+            <Section icon={<BookOpen size={16} />} label={t("bibliography")}>
               <ol className="space-y-3">
                 {species.references.map((ref, i) => (
                   <li key={i} className="flex items-start gap-3">
@@ -190,7 +196,7 @@ export default async function SpeciesDetailPage({
               <div className="border border-border bg-surface">
                 <div className="px-6 py-4 border-b border-border">
                   <p className="font-mono text-caption text-text3 uppercase tracking-widest">
-                    Taxonomía
+                    {t("taxonomy_label")}
                   </p>
                 </div>
                 <div className="divide-y divide-border">
@@ -219,7 +225,7 @@ export default async function SpeciesDetailPage({
               <div className="border border-border bg-surface">
                 <div className="px-6 py-4 border-b border-border">
                   <p className="font-mono text-caption text-text3 uppercase tracking-widest">
-                    Estado de conservación (UICN)
+                    {t("conservation_label")}
                   </p>
                 </div>
                 <div className="px-6 py-5">
@@ -240,7 +246,7 @@ export default async function SpeciesDetailPage({
               <div className="border border-border bg-surface">
                 <div className="px-6 py-4 border-b border-border">
                   <p className="font-mono text-caption text-text3 uppercase tracking-widest">
-                    Distribución geográfica
+                    {t("distribution_label")}
                   </p>
                 </div>
                 <div className="px-6 py-5">
@@ -251,7 +257,7 @@ export default async function SpeciesDetailPage({
                   {species.presenceInMexico && species.mexicoStates.length > 0 && (
                     <div>
                       <p className="font-mono text-caption text-text3 uppercase tracking-wide mb-3">
-                        Registros en México
+                        {t("records_label")}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {species.mexicoStates.map((state) => (
@@ -267,7 +273,7 @@ export default async function SpeciesDetailPage({
                   )}
                   {!species.presenceInMexico && (
                     <p className="font-mono text-caption text-text3 italic">
-                      Sin registros confirmados en México
+                      {t("no_records")}
                     </p>
                   )}
                 </div>
@@ -276,7 +282,7 @@ export default async function SpeciesDetailPage({
               {/* Tags */}
               <div className="border border-border bg-surface px-6 py-5">
                 <p className="font-mono text-caption text-text3 uppercase tracking-widest mb-3">
-                  Etiquetas
+                  {t("tags_label")}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {species.tags.map((tag) => (
@@ -290,22 +296,20 @@ export default async function SpeciesDetailPage({
                 </div>
               </div>
 
-              {/* Related species placeholder */}
+              {/* Related species */}
               <div className="border border-border bg-surface">
                 <div className="px-6 py-4 border-b border-border">
                   <p className="font-mono text-caption text-text3 uppercase tracking-widest">
-                    Especies relacionadas
+                    {t("related_label")}
                   </p>
                 </div>
                 <div className="divide-y divide-border">
-                  {PLACEHOLDER_SPECIES.filter(
-                    (s) => s.family === species.family && s.id !== species.id
-                  )
-                    .slice(0, 3)
-                    .map((rel) => (
+                  {relatedSpecies.map((rel) => {
+                    const relName = locale === "en" && rel.commonNameEn ? rel.commonNameEn : rel.commonNameEs;
+                    return (
                       <Link
                         key={rel.id}
-                        href={`/es/especies/${rel.slug}`}
+                        href={`/especies/${rel.slug}`}
                         className="flex items-center gap-4 px-6 py-4 hover:bg-void transition-colors duration-300 group"
                       >
                         <div className="relative w-14 h-14 shrink-0 overflow-hidden">
@@ -318,15 +322,14 @@ export default async function SpeciesDetailPage({
                         </div>
                         <div>
                           <p className="font-mono text-caption text-gold italic">{rel.scientificName}</p>
-                          <p className="font-sans text-caption text-text3">{rel.commonNameEs}</p>
+                          <p className="font-sans text-caption text-text3">{relName}</p>
                         </div>
                       </Link>
-                    ))}
-                  {PLACEHOLDER_SPECIES.filter(
-                    (s) => s.family === species.family && s.id !== species.id
-                  ).length === 0 && (
+                    );
+                  })}
+                  {relatedSpecies.length === 0 && (
                     <p className="px-6 py-4 font-mono text-caption text-text3 italic">
-                      No hay otras especies de esta familia en el catálogo.
+                      {t("no_related")}
                     </p>
                   )}
                 </div>

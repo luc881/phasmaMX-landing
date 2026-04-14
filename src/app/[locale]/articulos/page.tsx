@@ -1,14 +1,18 @@
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import ArticlesGrid from "@/components/articles/ArticlesGrid";
 
 export function generateStaticParams() {
   return [{ locale: "es" }, { locale: "en" }];
 }
 
-export const metadata = {
-  title: "Artículos — Phasma MX",
-  description: "Expediciones, taxonomía, divulgación y terrariofilia sobre Phasmatodea en México y América Latina.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "articles_page" });
+  return {
+    title: `${t("title_start")}${t("title_em")} — Phasma MX`,
+    description: t("description"),
+  };
+}
 
 export default async function ArticulosPage({
   params,
@@ -17,6 +21,7 @@ export default async function ArticulosPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "articles_page" });
 
   return (
     <div className="min-h-screen">
@@ -26,27 +31,25 @@ export default async function ArticulosPage({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
             <div className="lg:col-span-7">
               <p className="font-mono text-caption text-text3 uppercase tracking-widest mb-4">
-                Phasma MX · Publicaciones y divulgación
+                {t("label")}
               </p>
               <h1 className="font-display text-display-lg font-light text-text1 mb-5">
-                Ar
+                {t("title_start")}
                 <em className="italic text-gold" style={{ fontStyle: "italic" }}>
-                  tículos
+                  {t("title_em")}
                 </em>
               </h1>
               <p className="font-sans text-body-lg text-text2 leading-relaxed max-w-xl">
-                Expediciones de campo, revisiones taxonómicas, perfiles de especie y guías
-                de cría. Una ventana al trabajo científico y la divulgación sobre
-                Phasmatodea en México y América Latina.
+                {t("description")}
               </p>
             </div>
 
             {/* Stat blocks */}
             <div className="lg:col-span-5 flex flex-wrap gap-8 lg:justify-end">
               {[
-                ["10+", "Artículos"],
-                ["6", "Categorías"],
-                ["4", "Autores"],
+                ["10+", t("stat_articles")],
+                ["6", t("stat_categories")],
+                ["4", t("stat_authors")],
               ].map(([val, label]) => (
                 <div key={label} className="text-center">
                   <p className="font-display text-display-md font-light text-gold">{val}</p>

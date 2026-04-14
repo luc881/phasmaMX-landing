@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowLeft, Clock, Calendar, Tag, ArrowUpRight } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import {
   PLACEHOLDER_ARTICLES,
   CATEGORY_META,
   formatDate,
+  localizeArticle,
   type ArticlePlaceholder,
   type ArticleCategory,
 } from "@/lib/placeholder/articles";
@@ -22,12 +23,13 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string; locale: string }>;
 }) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const article = PLACEHOLDER_ARTICLES.find((a) => a.slug === slug);
   if (!article) return { title: "Artículo no encontrado — Phasma MX" };
+  const localized = localizeArticle(article, locale);
   return {
-    title: `${article.titleEs} — Phasma MX`,
-    description: article.excerpt.slice(0, 155),
+    title: `${localized.title} — Phasma MX`,
+    description: localized.excerpt.slice(0, 155),
   };
 }
 
@@ -39,13 +41,17 @@ export default async function ArticleDetailPage({
   const { slug, locale } = await params;
   setRequestLocale(locale);
 
-  const article = PLACEHOLDER_ARTICLES.find((a) => a.slug === slug);
-  if (!article) notFound();
+  const articleRaw = PLACEHOLDER_ARTICLES.find((a) => a.slug === slug);
+  if (!articleRaw) notFound();
 
+  const t = await getTranslations({ locale, namespace: "article_detail" });
+  const tArticles = await getTranslations({ locale, namespace: "articles_page" });
+
+  const article = localizeArticle(articleRaw, locale);
   const meta = CATEGORY_META[article.category as ArticleCategory];
   const related = PLACEHOLDER_ARTICLES.filter(
-    (a) => article.relatedSlugs.includes(a.slug)
-  );
+    (a) => articleRaw.relatedSlugs.includes(a.slug)
+  ).map((a) => localizeArticle(a, locale));
 
   return (
     <div className="min-h-screen">
@@ -53,7 +59,7 @@ export default async function ArticleDetailPage({
       <section className="relative h-[70vh] min-h-[500px] flex items-end overflow-hidden">
         <Image
           src={article.image}
-          alt={article.titleEs}
+          alt={article.title}
           fill
           priority
           quality={90}
@@ -65,11 +71,11 @@ export default async function ArticleDetailPage({
 
         {/* Back */}
         <Link
-          href="/es/articulos"
+          href="/articulos"
           className="absolute top-24 left-6 lg:left-16 z-10 flex items-center gap-2 font-mono text-caption text-text2 hover:text-gold transition-colors duration-300 bg-void/60 px-3 py-2 backdrop-blur-sm"
         >
           <ArrowLeft size={13} />
-          Artículos
+          {t("back")}
         </Link>
 
         {/* Hero content */}
@@ -77,15 +83,15 @@ export default async function ArticleDetailPage({
           <div className="max-w-3xl">
             <div className="flex items-center gap-4 mb-5">
               <span className={`font-mono text-caption uppercase tracking-widest px-2 py-1 border ${meta.color} ${meta.border} bg-void/60`}>
-                {meta.label}
+                {tArticles(meta.translationKey as Parameters<typeof tArticles>[0])}
               </span>
               <span className="font-mono text-caption text-text3 flex items-center gap-1.5">
                 <Clock size={11} />
-                {article.readingMinutes} min de lectura
+                {article.readingMinutes} {t("read_time")}
               </span>
             </div>
             <h1 className="font-display text-display-md font-light text-text1 leading-tight text-balance">
-              {article.titleEs}
+              {article.title}
             </h1>
           </div>
         </div>
@@ -114,30 +120,21 @@ export default async function ArticleDetailPage({
               {article.body.map((section, i) => {
                 if (section.type === "paragraph") {
                   return (
-                    <p
-                      key={i}
-                      className="font-sans text-body-lg text-text2 leading-relaxed"
-                    >
+                    <p key={i} className="font-sans text-body-lg text-text2 leading-relaxed">
                       {section.content}
                     </p>
                   );
                 }
                 if (section.type === "subheading") {
                   return (
-                    <h2
-                      key={i}
-                      className="font-display text-display-sm font-light text-text1 pt-6 pb-2 border-b border-border"
-                    >
+                    <h2 key={i} className="font-display text-display-sm font-light text-text1 pt-6 pb-2 border-b border-border">
                       {section.content}
                     </h2>
                   );
                 }
                 if (section.type === "pull-quote") {
                   return (
-                    <blockquote
-                      key={i}
-                      className="font-display text-display-sm font-light italic text-text1 border-l-2 border-gold pl-8 py-2 my-10"
-                    >
+                    <blockquote key={i} className="font-display text-display-sm font-light italic text-text1 border-l-2 border-gold pl-8 py-2 my-10">
                       {section.content}
                     </blockquote>
                   );
@@ -156,13 +153,9 @@ export default async function ArticleDetailPage({
                       </div>
                       {(section.caption || section.credit) && (
                         <figcaption className="flex items-start justify-between gap-4 mt-3 px-1">
-                          <p className="font-mono text-caption text-text3 italic">
-                            {section.caption}
-                          </p>
+                          <p className="font-mono text-caption text-text3 italic">{section.caption}</p>
                           {section.credit && (
-                            <p className="font-mono text-caption text-text3 shrink-0">
-                              {section.credit}
-                            </p>
+                            <p className="font-mono text-caption text-text3 shrink-0">{section.credit}</p>
                           )}
                         </figcaption>
                       )}
@@ -196,7 +189,7 @@ export default async function ArticleDetailPage({
               {/* Author card */}
               <div className="border border-border bg-surface">
                 <div className="px-6 py-4 border-b border-border">
-                  <p className="font-mono text-caption text-text3 uppercase tracking-widest">Autor</p>
+                  <p className="font-mono text-caption text-text3 uppercase tracking-widest">{t("author_label")}</p>
                 </div>
                 <div className="p-6">
                   <div className="flex items-center gap-4 mb-4">
@@ -204,12 +197,8 @@ export default async function ArticleDetailPage({
                       <span className="font-mono text-void font-bold">{article.author.initials}</span>
                     </div>
                     <div>
-                      <p className="font-sans text-body-lg text-text1 font-medium leading-snug">
-                        {article.author.name}
-                      </p>
-                      <p className="font-mono text-caption text-text3 mt-0.5">
-                        {article.author.role}
-                      </p>
+                      <p className="font-sans text-body-lg text-text1 font-medium leading-snug">{article.author.name}</p>
+                      <p className="font-mono text-caption text-text3 mt-0.5">{article.author.role}</p>
                     </div>
                   </div>
                 </div>
@@ -218,22 +207,24 @@ export default async function ArticleDetailPage({
               {/* Article metadata */}
               <div className="border border-border bg-surface divide-y divide-border">
                 <div className="flex justify-between px-6 py-3">
-                  <span className="font-mono text-caption text-text3 uppercase tracking-wide">Categoría</span>
-                  <span className={`font-mono text-caption ${meta.color}`}>{meta.label}</span>
+                  <span className="font-mono text-caption text-text3 uppercase tracking-wide">{t("category_label")}</span>
+                  <span className={`font-mono text-caption ${meta.color}`}>
+                    {tArticles(meta.translationKey as Parameters<typeof tArticles>[0])}
+                  </span>
                 </div>
                 <div className="flex justify-between px-6 py-3">
                   <span className="font-mono text-caption text-text3 uppercase tracking-wide flex items-center gap-2">
                     <Calendar size={11} />
-                    Publicado
+                    {t("published_label")}
                   </span>
-                  <span className="font-sans text-body-md text-text2">{formatDate(article.publishedAt)}</span>
+                  <span className="font-sans text-body-md text-text2">{formatDate(article.publishedAt, locale)}</span>
                 </div>
                 <div className="flex justify-between px-6 py-3">
                   <span className="font-mono text-caption text-text3 uppercase tracking-wide flex items-center gap-2">
                     <Clock size={11} />
-                    Lectura
+                    {t("reading_label")}
                   </span>
-                  <span className="font-sans text-body-md text-text2">{article.readingMinutes} minutos</span>
+                  <span className="font-sans text-body-md text-text2">{article.readingMinutes} {t("minutes")}</span>
                 </div>
               </div>
 
@@ -242,7 +233,7 @@ export default async function ArticleDetailPage({
                 <div className="border border-border bg-surface">
                   <div className="px-6 py-4 border-b border-border">
                     <p className="font-mono text-caption text-text3 uppercase tracking-widest">
-                      Artículos relacionados
+                      {t("related_label")}
                     </p>
                   </div>
                   <div className="divide-y divide-border">
@@ -251,13 +242,13 @@ export default async function ArticleDetailPage({
                       return (
                         <Link
                           key={rel.id}
-                          href={`/es/articulos/${rel.slug}`}
+                          href={`/articulos/${rel.slug}`}
                           className="flex gap-4 p-4 hover:bg-void transition-colors duration-300 group"
                         >
                           <div className="relative w-16 h-16 shrink-0 overflow-hidden">
                             <Image
                               src={rel.image}
-                              alt={rel.titleEs}
+                              alt={rel.title}
                               fill
                               className="object-cover group-hover:scale-105 transition-transform duration-400"
                             />
@@ -265,10 +256,10 @@ export default async function ArticleDetailPage({
                           <div className="flex flex-col justify-between min-w-0">
                             <div>
                               <p className={`font-mono text-caption uppercase tracking-widest mb-1 ${relMeta.color}`}>
-                                {relMeta.label}
+                                {tArticles(relMeta.translationKey as Parameters<typeof tArticles>[0])}
                               </p>
                               <p className="font-display text-body-lg font-light text-text1 line-clamp-2 leading-snug group-hover:text-gold transition-colors duration-300">
-                                {rel.titleEs}
+                                {rel.title}
                               </p>
                             </div>
                             <p className="font-mono text-caption text-text3 flex items-center gap-1 mt-1">
@@ -285,11 +276,11 @@ export default async function ArticleDetailPage({
 
               {/* Back to articles */}
               <Link
-                href="/es/articulos"
+                href="/articulos"
                 className="flex items-center justify-between w-full border border-border px-6 py-4 hover:border-border2 hover:bg-surface transition-colors duration-300 group"
               >
                 <span className="font-mono text-caption text-text2 uppercase tracking-widest group-hover:text-gold transition-colors duration-300">
-                  Ver todos los artículos
+                  {t("view_all")}
                 </span>
                 <ArrowUpRight size={14} className="text-text3 group-hover:text-gold transition-colors duration-300" />
               </Link>
@@ -305,17 +296,17 @@ export default async function ArticleDetailPage({
             <div className="flex items-center justify-between mb-12 gap-8">
               <div>
                 <p className="font-mono text-caption text-text3 uppercase tracking-widest mb-2">
-                  Continúa leyendo
+                  {t("continue")}
                 </p>
                 <h2 className="font-display text-display-sm font-light text-text1">
-                  Del mismo archivo
+                  {t("from_archive")}
                 </h2>
               </div>
               <Link
-                href="/es/articulos"
+                href="/articulos"
                 className="hidden md:flex items-center gap-2 font-mono text-caption text-text2 hover:text-gold transition-colors duration-300 uppercase tracking-widest shrink-0"
               >
-                Todos los artículos
+                {t("view_all")}
                 <ArrowUpRight size={13} />
               </Link>
             </div>
@@ -326,23 +317,23 @@ export default async function ArticleDetailPage({
                 return (
                   <Link
                     key={rel.id}
-                    href={`/es/articulos/${rel.slug}`}
+                    href={`/articulos/${rel.slug}`}
                     className="group flex gap-6 bg-void p-6 hover:bg-surface transition-colors duration-400"
                   >
                     <div className="relative w-24 h-24 shrink-0 overflow-hidden">
                       <Image
                         src={rel.image}
-                        alt={rel.titleEs}
+                        alt={rel.title}
                         fill
                         className="object-cover transition-transform duration-600 group-hover:scale-105"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className={`font-mono text-caption uppercase tracking-widest mb-2 ${relMeta.color}`}>
-                        {relMeta.label}
+                        {tArticles(relMeta.translationKey as Parameters<typeof tArticles>[0])}
                       </p>
                       <h3 className="font-display text-display-sm font-light text-text1 line-clamp-2 leading-tight group-hover:text-gold transition-colors duration-300">
-                        {rel.titleEs}
+                        {rel.title}
                       </h3>
                       <p className="font-mono text-caption text-text3 mt-3 flex items-center gap-1.5">
                         <Clock size={10} />
