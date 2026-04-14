@@ -10,6 +10,7 @@
   "hero": {
     "tagline": "El archivo definitivo de Phasmatodea en México y América Latina",
     "cta": "Explorar catálogo",
+    "cta_secondary": "Qué son los fásmidos",
     "scroll": "Desplazar"
   },
   "sections": {
@@ -25,7 +26,8 @@
     "intro_body_2": "Phasma MX nace como archivo científico de referencia para biólogos, entusiastas y conservacionistas, con énfasis en la fauna nativa de México, Centroamérica y las especies exóticas de interés taxonómico.",
     "stat_species_world": "especies descritas en el mundo",
     "stat_species_mx": "especies registradas en México",
-    "stat_endemic": "taxa endémicos"
+    "stat_endemic": "taxa endémicos",
+    "pull_quote": "Los fásmidos son el resultado de millones de años de coevolución con las plantas que los rodean — arquitectura viva."
   },
   "species_card": {
     "family": "Familia",
@@ -33,6 +35,14 @@
     "habitat": "Hábitat",
     "status": "Estado de conservación",
     "view": "Ver especie"
+  },
+  "featured_species": {
+    "label": "Phasmatodea · Selección curatorial",
+    "view_catalog": "Ver catálogo completo"
+  },
+  "latest_articles": {
+    "label": "Divulgación · Archivo",
+    "view_all": "Todos los artículos"
   },
   "articles": {
     "read": "Leer artículo",
@@ -45,15 +55,186 @@
     "placeholder": "Mapa interactivo disponible próximamente"
   },
   "cta": {
+    "label": "Phasmatodea · Catálogo sistemático",
     "catalog_title": "Catálogo de especies",
     "catalog_body": "Accede al registro completo de especies nativas, exóticas y endémicas con fichas taxonómicas, fotografías de campo y referencias bibliográficas.",
     "catalog_btn": "Ver todas las especies",
-    "publications_btn": "Publicaciones científicas"
+    "publications_btn": "Publicaciones científicas",
+    "stat_native": "Nativas",
+    "stat_exotic": "Exóticas",
+    "stat_endemic": "Endémicas"
   },
   "footer": {
     "description": "Archivo científico de referencia sobre Phasmatodea en México y América Latina.",
     "rights": "Todos los derechos reservados.",
-    "credits": "Fotografías y datos de campo por colaboradores del proyecto."
+    "credits": "Fotografías y datos de campo por colaboradores del proyecto.",
+    "col_archive": "Archivo",
+    "col_project": "Proyecto",
+    "links": {
+      "catalog": "Catálogo de especies",
+      "articles": "Artículos de divulgación",
+      "expeditions": "Expediciones de campo",
+      "publications": "Publicaciones científicas",
+      "about": "Acerca de Phasma MX",
+      "collaborate": "Colaborar",
+      "contact": "Contacto"
+    }
+  },
+  "catalog": {
+    "label": "Phasmatodea · Catálogo sistemático",
+    "title_start": "Catálogo de",
+    "title_em": "especies",
+    "description": "Registro sistemático de fásmidos con fichas taxonómicas, fotografías de campo y referencias bibliográficas. Incluye especies nativas de México, exóticas de interés científico y taxa endémicos.",
+    "stat_species": "Especies",
+    "stat_native": "Nativas MX",
+    "stat_families": "Familias",
+    "filters": {
+      "search_placeholder": "Buscar especie, familia...",
+      "filters_btn": "Filtros",
+      "clear": "Limpiar",
+      "family_label": "Familia",
+      "origin_label": "Origen",
+      "status_label": "Estado UICN",
+      "all_families": "Todas las familias",
+      "all_origins": "Todos los orígenes",
+      "all_statuses": "Todos los estados",
+      "no_results_label": "Sin resultados",
+      "no_results_desc": "No se encontraron especies con los filtros seleccionados.",
+      "view_all_btn": "Ver todas las especies",
+      "count_of": "/ {total} especies",
+      "origin_all": "Todos los orígenes",
+      "origin_native": "Nativa de México",
+      "origin_exotic": "Exótica",
+      "origin_central": "Centroamérica",
+      "origin_south": "Sudamérica",
+      "origin_asia": "Asia",
+      "origin_australia": "Australia",
+      "origin_europe": "Europa"
+    },
+    "card": {
+      "view": "Ver ficha",
+      "density": "Mayor densidad de registros",
+      "isolated": "Registros aislados"
+    },
+    "contribute_label": "¿Conoces una especie no registrada?",
+    "contribute_title": "Contribuye al archivo",
+    "contribute_body": "Si tienes registros fotográficos, datos de campo o publicaciones sobre fásmidos en México o América Latina, contáctanos para colaborar.",
+    "contribute_btn": "Cómo colaborar"
+  },
+  "species_detail": {
+    "back": "Catálogo",
+    "description": "Descripción general",
+    "morphology": "Morfología",
+    "females": "Hembras",
+    "males": "Machos",
+    "nymphs": "Ninfas",
+    "eggs": "Huevos",
+    "habitat": "Hábitat y comportamiento",
+    "food_plants": "Plantas hospederas",
+    "food_plants_note": "Lista basada en datos de cultivo. Las plantas marcadas con nombre científico son las preferidas en campo.",
+    "breeding": "Cría en cautiverio",
+    "gallery": "Galería fotográfica",
+    "bibliography": "Bibliografía",
+    "taxonomy_label": "Taxonomía",
+    "conservation_label": "Estado de conservación (UICN)",
+    "distribution_label": "Distribución geográfica",
+    "records_label": "Registros en México",
+    "no_records": "Sin registros confirmados en México",
+    "tags_label": "Etiquetas",
+    "related_label": "Especies relacionadas",
+    "no_related": "No hay otras especies de esta familia en el catálogo.",
+    "map_locations": "{n} localidad registrada",
+    "map_locations_plural": "{n} localidades registradas",
+    "map_collector": "Colectado por",
+    "map_date": "Fecha de registro",
+    "view_species": "Ver especie"
+  },
+  "articles_page": {
+    "label": "Phasma MX · Publicaciones y divulgación",
+    "title_start": "Ar",
+    "title_em": "tículos",
+    "description": "Expediciones de campo, revisiones taxonómicas, perfiles de especie y guías de cría. Una ventana al trabajo científico y la divulgación sobre Phasmatodea en México y América Latina.",
+    "stat_articles": "Artículos",
+    "stat_categories": "Categorías",
+    "stat_authors": "Autores",
+    "archive_divider": "Archivo",
+    "all_articles": "Todos los artículos",
+    "cat_all": "Todos",
+    "cat_expedition": "Expedición",
+    "cat_taxonomy": "Taxonomía",
+    "cat_species_month": "Especie del mes",
+    "cat_outreach": "Divulgación",
+    "cat_conservation": "Conservación",
+    "cat_care": "Terrariofilia",
+    "count": "artículos"
+  },
+  "article_detail": {
+    "back": "Artículos",
+    "read_time": "min de lectura",
+    "author_label": "Autor",
+    "category_label": "Categoría",
+    "published_label": "Publicado",
+    "reading_label": "Lectura",
+    "minutes": "minutos",
+    "related_label": "Artículos relacionados",
+    "view_all": "Ver todos los artículos",
+    "continue": "Continúa leyendo",
+    "from_archive": "Del mismo archivo"
+  },
+  "about": {
+    "hero_label": "Phasma MX · Proyecto",
+    "hero_title_start": "Un archivo para los",
+    "hero_title_em": "invisibles",
+    "hero_body": "Phasma MX nació de una convicción simple: que los fásmidos de México merecen un registro sistemático, riguroso y accesible. Somos un equipo pequeño de biólogos, editores y aficionados que documenta, publica y divulga el conocimiento sobre el orden Phasmatodea en México y América Latina.",
+    "mission_label": "Misión",
+    "mission_body_1": "Construir el archivo más completo de Phasmatodea en México: con fichas taxonómicas verificadas, fotografías de campo, distribución georreferenciada, y artículos que traduzcan la investigación científica para públicos amplios.",
+    "mission_body_2": "No somos una institución académica ni una empresa. Somos un proyecto colaborativo abierto a biólogos, fotógrafos, criadores y cualquier persona que quiera contribuir al conocimiento de estos extraordinarios insectos.",
+    "principles_label": "Principios",
+    "principle_1_title": "Rigor científico",
+    "principle_1_desc": "Todo el contenido del catálogo está verificado contra fuentes primarias y el Phasmida Species File Online.",
+    "principle_2_title": "Acceso abierto",
+    "principle_2_desc": "El archivo es de acceso gratuito. Los datos de distribución son descargables para uso científico.",
+    "principle_3_title": "Divulgación honesta",
+    "principle_3_desc": "Cuando algo no se sabe, lo decimos. Distinguimos entre certeza taxonómica y registro preliminar.",
+    "stats_label": "Métricas",
+    "team_label": "Equipo",
+    "team_title": "Las personas detrás del archivo",
+    "team_orcid": "ORCID",
+    "team_profile": "Perfil",
+    "history_label": "Historia",
+    "history_title": "Cómo llegamos aquí",
+    "collaborate_label": "Colaborar",
+    "collaborate_title": "El archivo crece con cada registro",
+    "collaborate_body": "Si tienes fotografías de campo, datos de distribución, registros de crianza o publicaciones sobre fásmidos en México o América Latina, queremos saber de ti. No se necesita ser investigador: cualquier observación documentada tiene valor científico.",
+    "link_catalog_label": "Catálogo",
+    "link_catalog_desc": "Explorar las especies documentadas",
+    "link_articles_label": "Artículos",
+    "link_articles_desc": "Leer el archivo de divulgación",
+    "contact_btn": "Contacto directo"
+  },
+  "not_found": {
+    "label": "Phasmatodea · Página no encontrada",
+    "title": "Esta especie no está en el catálogo",
+    "body": "La página que buscas no existe o ha sido movida. Quizás el espécimen fue reclasificado, o simplemente está pendiente de documentación.",
+    "nav_title": "Continúa explorando",
+    "link_home": "Inicio",
+    "link_home_sub": "Página principal del archivo",
+    "link_catalog": "Catálogo de especies",
+    "link_catalog_sub": "240+ fásmidos documentados",
+    "link_articles": "Artículos",
+    "link_articles_sub": "Expediciones, taxonomía y divulgación",
+    "footer_note": "Orden Phasmatodea · Error 404 · Registro no encontrado"
+  },
+  "search": {
+    "placeholder": "Buscar especies, artículos, familias...",
+    "species_heading": "Especies",
+    "articles_heading": "Artículos",
+    "no_results": "Sin resultados para \"{query}\"",
+    "empty_hint": "Busca por nombre científico, familia, etiqueta o título de artículo",
+    "view_catalog": "Ver catálogo completo",
+    "view_articles": "Ver todos los artículos",
+    "open_label": "Buscar",
+    "close_label": "Cerrar búsqueda"
   },
   "locale": {
     "switch": "English"

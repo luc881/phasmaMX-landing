@@ -10,6 +10,7 @@
   "hero": {
     "tagline": "The definitive archive of Phasmatodea in Mexico and Latin America",
     "cta": "Explore catalog",
+    "cta_secondary": "What are phasmids",
     "scroll": "Scroll"
   },
   "sections": {
@@ -25,7 +26,8 @@
     "intro_body_2": "Phasma MX was created as a scientific reference archive for biologists, enthusiasts and conservationists, with emphasis on native fauna from Mexico, Central America and exotic species of taxonomic interest.",
     "stat_species_world": "species described worldwide",
     "stat_species_mx": "species recorded in Mexico",
-    "stat_endemic": "endemic taxa"
+    "stat_endemic": "endemic taxa",
+    "pull_quote": "Phasmids are the result of millions of years of co-evolution with the plants around them — living architecture."
   },
   "species_card": {
     "family": "Family",
@@ -33,6 +35,14 @@
     "habitat": "Habitat",
     "status": "Conservation status",
     "view": "View species"
+  },
+  "featured_species": {
+    "label": "Phasmatodea · Curatorial selection",
+    "view_catalog": "View full catalog"
+  },
+  "latest_articles": {
+    "label": "Outreach · Archive",
+    "view_all": "All articles"
   },
   "articles": {
     "read": "Read article",
@@ -45,15 +55,186 @@
     "placeholder": "Interactive map coming soon"
   },
   "cta": {
+    "label": "Phasmatodea · Systematic catalog",
     "catalog_title": "Species catalog",
     "catalog_body": "Access the complete registry of native, exotic and endemic species with taxonomic sheets, field photographs and bibliographic references.",
     "catalog_btn": "View all species",
-    "publications_btn": "Scientific publications"
+    "publications_btn": "Scientific publications",
+    "stat_native": "Native",
+    "stat_exotic": "Exotic",
+    "stat_endemic": "Endemic"
   },
   "footer": {
     "description": "Scientific reference archive on Phasmatodea in Mexico and Latin America.",
     "rights": "All rights reserved.",
-    "credits": "Field photographs and data by project contributors."
+    "credits": "Field photographs and data by project contributors.",
+    "col_archive": "Archive",
+    "col_project": "Project",
+    "links": {
+      "catalog": "Species catalog",
+      "articles": "Articles",
+      "expeditions": "Field expeditions",
+      "publications": "Scientific publications",
+      "about": "About Phasma MX",
+      "collaborate": "Collaborate",
+      "contact": "Contact"
+    }
+  },
+  "catalog": {
+    "label": "Phasmatodea · Systematic catalog",
+    "title_start": "Species",
+    "title_em": "catalog",
+    "description": "Systematic registry of phasmids with taxonomic sheets, field photographs and bibliographic references. Includes native Mexican species, exotic species of scientific interest and endemic taxa.",
+    "stat_species": "Species",
+    "stat_native": "Native MX",
+    "stat_families": "Families",
+    "filters": {
+      "search_placeholder": "Search species, family...",
+      "filters_btn": "Filters",
+      "clear": "Clear",
+      "family_label": "Family",
+      "origin_label": "Origin",
+      "status_label": "IUCN Status",
+      "all_families": "All families",
+      "all_origins": "All origins",
+      "all_statuses": "All statuses",
+      "no_results_label": "No results",
+      "no_results_desc": "No species found with the selected filters.",
+      "view_all_btn": "View all species",
+      "count_of": "/ {total} species",
+      "origin_all": "All origins",
+      "origin_native": "Native to Mexico",
+      "origin_exotic": "Exotic",
+      "origin_central": "Central America",
+      "origin_south": "South America",
+      "origin_asia": "Asia",
+      "origin_australia": "Australia",
+      "origin_europe": "Europe"
+    },
+    "card": {
+      "view": "View sheet",
+      "density": "High density records",
+      "isolated": "Isolated records"
+    },
+    "contribute_label": "Know an unregistered species?",
+    "contribute_title": "Contribute to the archive",
+    "contribute_body": "If you have field photographs, distribution data or publications on phasmids in Mexico or Latin America, contact us to collaborate.",
+    "contribute_btn": "How to collaborate"
+  },
+  "species_detail": {
+    "back": "Catalog",
+    "description": "General description",
+    "morphology": "Morphology",
+    "females": "Females",
+    "males": "Males",
+    "nymphs": "Nymphs",
+    "eggs": "Eggs",
+    "habitat": "Habitat and behavior",
+    "food_plants": "Host plants",
+    "food_plants_note": "List based on captive breeding data. Plants listed with scientific name are preferred in the field.",
+    "breeding": "Captive breeding",
+    "gallery": "Photo gallery",
+    "bibliography": "Bibliography",
+    "taxonomy_label": "Taxonomy",
+    "conservation_label": "Conservation status (IUCN)",
+    "distribution_label": "Geographic distribution",
+    "records_label": "Records in Mexico",
+    "no_records": "No confirmed records in Mexico",
+    "tags_label": "Tags",
+    "related_label": "Related species",
+    "no_related": "No other species of this family in the catalog.",
+    "map_locations": "{n} recorded location",
+    "map_locations_plural": "{n} recorded locations",
+    "map_collector": "Collected by",
+    "map_date": "Record date",
+    "view_species": "View species"
+  },
+  "articles_page": {
+    "label": "Phasma MX · Publications and outreach",
+    "title_start": "Ar",
+    "title_em": "ticles",
+    "description": "Field expeditions, taxonomic reviews, species profiles and breeding guides. A window into the scientific work and outreach on Phasmatodea in Mexico and Latin America.",
+    "stat_articles": "Articles",
+    "stat_categories": "Categories",
+    "stat_authors": "Authors",
+    "archive_divider": "Archive",
+    "all_articles": "All articles",
+    "cat_all": "All",
+    "cat_expedition": "Expedition",
+    "cat_taxonomy": "Taxonomy",
+    "cat_species_month": "Species of month",
+    "cat_outreach": "Outreach",
+    "cat_conservation": "Conservation",
+    "cat_care": "Terrarium keeping",
+    "count": "articles"
+  },
+  "article_detail": {
+    "back": "Articles",
+    "read_time": "min read",
+    "author_label": "Author",
+    "category_label": "Category",
+    "published_label": "Published",
+    "reading_label": "Reading",
+    "minutes": "minutes",
+    "related_label": "Related articles",
+    "view_all": "View all articles",
+    "continue": "Continue reading",
+    "from_archive": "From the archive"
+  },
+  "about": {
+    "hero_label": "Phasma MX · Project",
+    "hero_title_start": "An archive for the",
+    "hero_title_em": "invisible",
+    "hero_body": "Phasma MX was born from a simple conviction: that Mexico's phasmids deserve a systematic, rigorous and accessible registry. We are a small team of biologists, editors and enthusiasts who document, publish and communicate knowledge about the order Phasmatodea in Mexico and Latin America.",
+    "mission_label": "Mission",
+    "mission_body_1": "To build the most complete archive of Phasmatodea in Mexico: with verified taxonomic sheets, field photographs, georeferenced distribution, and articles that translate scientific research for broad audiences.",
+    "mission_body_2": "We are not an academic institution or a company. We are a collaborative project open to biologists, photographers, breeders and anyone who wants to contribute to the knowledge of these extraordinary insects.",
+    "principles_label": "Principles",
+    "principle_1_title": "Scientific rigor",
+    "principle_1_desc": "All catalog content is verified against primary sources and the Phasmida Species File Online.",
+    "principle_2_title": "Open access",
+    "principle_2_desc": "The archive is free to access. Distribution data is downloadable for scientific use.",
+    "principle_3_title": "Honest outreach",
+    "principle_3_desc": "When something is unknown, we say so. We distinguish between taxonomic certainty and preliminary records.",
+    "stats_label": "Metrics",
+    "team_label": "Team",
+    "team_title": "The people behind the archive",
+    "team_orcid": "ORCID",
+    "team_profile": "Profile",
+    "history_label": "History",
+    "history_title": "How we got here",
+    "collaborate_label": "Collaborate",
+    "collaborate_title": "The archive grows with every record",
+    "collaborate_body": "If you have field photographs, distribution data, breeding records or publications on phasmids in Mexico or Latin America, we want to hear from you. You don't need to be a researcher: any documented observation has scientific value.",
+    "link_catalog_label": "Catalog",
+    "link_catalog_desc": "Explore the documented species",
+    "link_articles_label": "Articles",
+    "link_articles_desc": "Read the outreach archive",
+    "contact_btn": "Direct contact"
+  },
+  "not_found": {
+    "label": "Phasmatodea · Page not found",
+    "title": "This species is not in the catalog",
+    "body": "The page you are looking for does not exist or has been moved. Perhaps the specimen was reclassified, or it is simply pending documentation.",
+    "nav_title": "Keep exploring",
+    "link_home": "Home",
+    "link_home_sub": "Archive main page",
+    "link_catalog": "Species catalog",
+    "link_catalog_sub": "240+ documented phasmids",
+    "link_articles": "Articles",
+    "link_articles_sub": "Expeditions, taxonomy and outreach",
+    "footer_note": "Order Phasmatodea · Error 404 · Record not found"
+  },
+  "search": {
+    "placeholder": "Search species, articles, families...",
+    "species_heading": "Species",
+    "articles_heading": "Articles",
+    "no_results": "No results for \"{query}\"",
+    "empty_hint": "Search by scientific name, family, tag or article title",
+    "view_catalog": "View full catalog",
+    "view_articles": "View all articles",
+    "open_label": "Search",
+    "close_label": "Close search"
   },
   "locale": {
     "switch": "Español"
