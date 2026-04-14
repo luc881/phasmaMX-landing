@@ -24,11 +24,12 @@ export interface ArticlePlaceholder {
   id: string;
   slug: string;
   titleEs: string;
+  titleEn: string;
   publishedAt: string;
   readingMinutes: number;
   category: ArticleCategory;
-  categoryLabel: string;
   excerpt: string;
+  excerptEn: string;
   image: string;
   imageCaption: string;
   author: ArticleAuthor;
@@ -37,26 +38,35 @@ export interface ArticlePlaceholder {
   relatedSlugs: string[];
 }
 
+/** Pick locale-aware fields from an article */
+export function localizeArticle(article: ArticlePlaceholder, locale: string) {
+  return {
+    ...article,
+    title: locale === "en" ? article.titleEn : article.titleEs,
+    excerpt: locale === "en" ? article.excerptEn : article.excerpt,
+  };
+}
+
 export const CATEGORY_META: Record<
   ArticleCategory,
-  { label: string; color: string; border: string }
+  { label: string; translationKey: string; color: string; border: string }
 > = {
-  expedition:        { label: "Expedición",      color: "text-lichen",  border: "border-lichen/40"  },
-  taxonomy:          { label: "Taxonomía",        color: "text-gold",    border: "border-gold/40"    },
-  "species-of-month":{ label: "Especie del mes",  color: "text-amber",   border: "border-amber/40"   },
-  outreach:          { label: "Divulgación",       color: "text-text2",   border: "border-border2"    },
-  conservation:      { label: "Conservación",      color: "text-amber",   border: "border-amber/40"   },
-  care:              { label: "Terrariofilia",      color: "text-gold",    border: "border-gold/40"    },
+  expedition:        { label: "Expedición",      translationKey: "cat_expedition",     color: "text-lichen",  border: "border-lichen/40"  },
+  taxonomy:          { label: "Taxonomía",        translationKey: "cat_taxonomy",        color: "text-gold",    border: "border-gold/40"    },
+  "species-of-month":{ label: "Especie del mes",  translationKey: "cat_species_month",   color: "text-amber",   border: "border-amber/40"   },
+  outreach:          { label: "Divulgación",       translationKey: "cat_outreach",        color: "text-text2",   border: "border-border2"    },
+  conservation:      { label: "Conservación",      translationKey: "cat_conservation",    color: "text-amber",   border: "border-amber/40"   },
+  care:              { label: "Terrariofilia",      translationKey: "cat_care",            color: "text-gold",    border: "border-gold/40"    },
 };
 
-export const CATEGORIES: { value: string; label: string }[] = [
-  { value: "all",             label: "Todos" },
-  { value: "expedition",      label: "Expedición" },
-  { value: "taxonomy",        label: "Taxonomía" },
-  { value: "species-of-month",label: "Especie del mes" },
-  { value: "outreach",        label: "Divulgación" },
-  { value: "conservation",    label: "Conservación" },
-  { value: "care",            label: "Terrariofilia" },
+export const CATEGORIES: { value: string; label: string; translationKey: string }[] = [
+  { value: "all",              label: "Todos",           translationKey: "cat_all" },
+  { value: "expedition",       label: "Expedición",      translationKey: "cat_expedition" },
+  { value: "taxonomy",         label: "Taxonomía",       translationKey: "cat_taxonomy" },
+  { value: "species-of-month", label: "Especie del mes", translationKey: "cat_species_month" },
+  { value: "outreach",         label: "Divulgación",     translationKey: "cat_outreach" },
+  { value: "conservation",     label: "Conservación",    translationKey: "cat_conservation" },
+  { value: "care",             label: "Terrariofilia",   translationKey: "cat_care" },
 ];
 
 export const PLACEHOLDER_ARTICLES: ArticlePlaceholder[] = [
@@ -64,11 +74,12 @@ export const PLACEHOLDER_ARTICLES: ArticlePlaceholder[] = [
     id: "1",
     slug: "bacteria-ploiaria-veracruz",
     titleEs: "Primeros registros de Bacteria ploiaria en Veracruz",
+    titleEn: "First Records of Bacteria ploiaria in Veracruz",
     publishedAt: "2024-03-15",
     readingMinutes: 8,
     category: "expedition",
-    categoryLabel: "Expedición",
     excerpt: "Durante una expedición nocturna en la Sierra de los Tuxtlas, el equipo de Phasma MX documentó por primera vez la presencia de esta especie en territorio mexicano, ampliando el rango de distribución conocido en más de 400 km.",
+    excerptEn: "During a nocturnal expedition in the Sierra de los Tuxtlas, the Phasma MX team documented for the first time the presence of this species in Mexican territory, extending the known distribution range by over 400 km.",
     image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=85&fit=crop",
     imageCaption: "Sotobosque de la Sierra de los Tuxtlas, Veracruz — hábitat del registro.",
     author: { name: "Dr. Martín Vidal", role: "Investigador asociado", initials: "MV" },
@@ -90,11 +101,12 @@ export const PLACEHOLDER_ARTICLES: ArticlePlaceholder[] = [
     id: "2",
     slug: "taxonomia-phasmatodea-2024",
     titleEs: "Taxonomía actualizada de Phasmatodea: nuevas familias y géneros",
+    titleEn: "Updated Phasmatodea Taxonomy: New Families and Genera",
     publishedAt: "2024-02-08",
     readingMinutes: 12,
     category: "taxonomy",
-    categoryLabel: "Taxonomía",
     excerpt: "La revisión filogenómica publicada en Systematic Entomology reordena 12 géneros y eleva tres subfamilias al rango de familia. Un resumen accesible para biólogos no especialistas en sistemática molecular.",
+    excerptEn: "A phylogenomic revision published in Systematic Entomology reorganizes 12 genera and elevates three subfamilies to family rank. An accessible summary for non-specialist biologists.",
     image: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=1200&q=85&fit=crop",
     imageCaption: "Vista de colección entomológica con especímenes tipo de Phasmatodea.",
     author: { name: "Lucía Herrera", role: "Editora científica", initials: "LH" },
@@ -115,11 +127,12 @@ export const PLACEHOLDER_ARTICLES: ArticlePlaceholder[] = [
     id: "3",
     slug: "extatosoma-tiaratum-mimetismo",
     titleEs: "Especie del mes: Extatosoma tiaratum y su mimetismo mirmecomorfo",
+    titleEn: "Species of the Month: Extatosoma tiaratum and Its Myrmecomorphic Mimicry",
     publishedAt: "2024-01-20",
     readingMinutes: 7,
     category: "species-of-month",
-    categoryLabel: "Especie del mes",
     excerpt: "Las ninfas recién eclosionadas de E. tiaratum imitan con asombrosa fidelidad a las hormigas del género Leptomyrmex. Un caso de mimetismo batesiano que tiene implicaciones ecológicas y evolutivas de largo alcance.",
+    excerptEn: "Newly hatched nymphs of E. tiaratum imitate ants of the genus Leptomyrmex with astonishing fidelity. A case of Batesian mimicry with far-reaching ecological and evolutionary implications.",
     image: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1200&q=85&fit=crop",
     imageCaption: "Ninfas de primer estadio de E. tiaratum sobre rama de Eucalyptus.",
     author: { name: "Carlos Mendoza", role: "Biólogo de campo", initials: "CM" },
@@ -140,11 +153,12 @@ export const PLACEHOLDER_ARTICLES: ArticlePlaceholder[] = [
     id: "4",
     slug: "guia-cria-heteropteryx",
     titleEs: "Guía de cría: Heteropteryx dilatata para principiantes",
+    titleEn: "Care Guide: Heteropteryx dilatata for Beginners",
     publishedAt: "2024-01-05",
     readingMinutes: 10,
     category: "care",
-    categoryLabel: "Terrariofilia",
     excerpt: "Una de las especies más demandadas en terrariofilia por su tamaño imponente y dimorfismo sexual extremo. Todo lo que debes saber sobre instalación, alimentación, manejo e incubación antes de adquirir un ejemplar.",
+    excerptEn: "One of the most sought-after species in stick insect keeping for its imposing size and extreme sexual dimorphism. Everything you need to know about housing, feeding, handling and egg incubation.",
     image: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1200&q=85&fit=crop",
     imageCaption: "Hembra adulta de Heteropteryx dilatata sobre rama de Psidium guajava.",
     author: { name: "Sofía Ramírez", role: "Especialista en terrariofilia", initials: "SR" },
@@ -167,11 +181,12 @@ export const PLACEHOLDER_ARTICLES: ArticlePlaceholder[] = [
     id: "5",
     slug: "distribucion-fasmidos-mexico",
     titleEs: "Distribución de Phasmatodea en México: estado del conocimiento",
+    titleEn: "Phasmatodea Distribution in Mexico: State of Knowledge",
     publishedAt: "2023-11-30",
     readingMinutes: 15,
     category: "conservation",
-    categoryLabel: "Conservación",
     excerpt: "Revisamos el estado actual del conocimiento sobre la diversidad y distribución de fásmidos en México. Con más de 120 especies registradas, el país es uno de los centros de diversidad del orden, pero el 60 % de los estados siguen sin colectas sistemáticas.",
+    excerptEn: "We review the current state of knowledge on the diversity and distribution of stick insects in Mexico. With over 120 recorded species, the country is one of the order's diversity centers, yet 60% of states still lack systematic surveys.",
     image: "https://images.unsplash.com/photo-1511497584788-876760111969?w=1200&q=85&fit=crop",
     imageCaption: "Bosque mesófilo de montaña en Oaxaca — uno de los hábitats de mayor riqueza de fásmidos en México.",
     author: { name: "Dr. Martín Vidal", role: "Investigador asociado", initials: "MV" },
@@ -190,11 +205,12 @@ export const PLACEHOLDER_ARTICLES: ArticlePlaceholder[] = [
     id: "6",
     slug: "ecologia-fasmidos-bosques",
     titleEs: "El papel ecológico de los fásmidos en los bosques tropicales",
+    titleEn: "The Ecological Role of Stick Insects in Tropical Forests",
     publishedAt: "2023-10-12",
     readingMinutes: 9,
     category: "outreach",
-    categoryLabel: "Divulgación",
     excerpt: "Más allá de su fascinante camuflaje, los insectos palo desempeñan roles ecológicos concretos como herbívoros, presas y dispersores de semillas. Una revisión de la evidencia científica disponible.",
+    excerptEn: "Beyond their fascinating camouflage, stick insects play concrete ecological roles as herbivores, prey and seed dispersers. A review of the available scientific evidence.",
     image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=85&fit=crop",
     imageCaption: "Dosel de bosque tropical en Chiapas — hábitat principal de fásmidos mexicanos.",
     author: { name: "Lucía Herrera", role: "Editora científica", initials: "LH" },
@@ -213,11 +229,12 @@ export const PLACEHOLDER_ARTICLES: ArticlePlaceholder[] = [
     id: "7",
     slug: "phasmida-species-file-guia",
     titleEs: "Cómo usar el Phasmida Species File para investigación",
+    titleEn: "How to Use the Phasmida Species File for Research",
     publishedAt: "2023-09-04",
     readingMinutes: 6,
     category: "outreach",
-    categoryLabel: "Divulgación",
     excerpt: "El Phasmida Species File Online es la base de datos taxonómica de referencia para el orden. Esta guía práctica explica cómo navegar sus recursos, interpretar la nomenclatura y citar correctamente la fuente.",
+    excerptEn: "The Phasmida Species File Online is the reference taxonomic database for the order. This practical guide explains how to navigate its resources, interpret nomenclature and cite the source correctly.",
     image: "https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=1200&q=85&fit=crop",
     imageCaption: "Pantalla de consulta del Phasmida Species File versión 6.1.",
     author: { name: "Carlos Mendoza", role: "Biólogo de campo", initials: "CM" },
@@ -236,11 +253,12 @@ export const PLACEHOLDER_ARTICLES: ArticlePlaceholder[] = [
     id: "8",
     slug: "fotoperiodo-cria-phasmatodea",
     titleEs: "Efecto del fotoperiodo en la cría de fásmidos de clima templado",
+    titleEn: "Photoperiod Effects on Temperate Stick Insect Keeping",
     publishedAt: "2023-08-18",
     readingMinutes: 11,
     category: "care",
-    categoryLabel: "Terrariofilia",
     excerpt: "Las especies originarias de zonas templadas requieren variación de luz y temperatura para completar su ciclo de vida. Explicamos los mecanismos de diapausa y cómo replicarlos en terrariofilia con equipo básico.",
+    excerptEn: "Species from temperate zones require light and temperature variation to complete their life cycle. We explain diapause mechanisms and how to replicate them in terrarium keeping with basic equipment.",
     image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&q=85&fit=crop",
     imageCaption: "Terrario con control de temperatura y fotoperiodo para Diapheromera velii.",
     author: { name: "Sofía Ramírez", role: "Especialista en terrariofilia", initials: "SR" },
@@ -258,11 +276,12 @@ export const PLACEHOLDER_ARTICLES: ArticlePlaceholder[] = [
     id: "9",
     slug: "sipyloidea-sipylus-startle",
     titleEs: "Alas rosas, depredadores sorprendidos: el flash display de Sipyloidea sipylus",
+    titleEn: "Pink Wings, Startled Predators: The Flash Display of Sipyloidea sipylus",
     publishedAt: "2023-07-03",
     readingMinutes: 6,
     category: "species-of-month",
-    categoryLabel: "Especie del mes",
     excerpt: "Cuando está inmóvil sobre una rama, Sipyloidea sipylus es perfectamente invisible. Cuando es perturbada, despliega alas posteriores de un rosa intenso que sorprende a cualquier depredador. Un análisis del 'deimatic display' en Phasmatodea.",
+    excerptEn: "When motionless on a branch, Sipyloidea sipylus is perfectly invisible. When disturbed, it unfolds vivid pink hindwings that startle any predator. An analysis of deimatic display in Phasmatodea.",
     image: "https://images.unsplash.com/photo-1560719887-fe3105fa1e55?w=1200&q=85&fit=crop",
     imageCaption: "Hembra adulta de Sipyloidea sipylus con alas posteriores desplegadas.",
     author: { name: "Carlos Mendoza", role: "Biólogo de campo", initials: "CM" },
@@ -279,11 +298,12 @@ export const PLACEHOLDER_ARTICLES: ArticlePlaceholder[] = [
     id: "10",
     slug: "conservacion-phasmatodea-lista-roja",
     titleEs: "Fásmidos en la Lista Roja de la UICN: qué sabemos y qué falta",
+    titleEn: "Stick Insects on the IUCN Red List: What We Know and What's Missing",
     publishedAt: "2023-05-22",
     readingMinutes: 13,
     category: "conservation",
-    categoryLabel: "Conservación",
     excerpt: "De las más de 3,500 especies de Phasmatodea descritas, sólo 36 han sido evaluadas formalmente por la UICN. La falta de información básica sobre distribución y ecología es el principal obstáculo para la conservación del grupo.",
+    excerptEn: "Of the more than 3,500 described Phasmatodea species, only 36 have been formally assessed by the IUCN. Lack of basic data on distribution and ecology is the main obstacle to conservation of the group.",
     image: "https://images.unsplash.com/photo-1510784722466-f2aa240af4cf?w=1200&q=85&fit=crop",
     imageCaption: "Bosque montano en riesgo de deforestación en Oaxaca — hábitat de fásmidos endémicos.",
     author: { name: "Dr. Martín Vidal", role: "Investigador asociado", initials: "MV" },
@@ -299,8 +319,8 @@ export const PLACEHOLDER_ARTICLES: ArticlePlaceholder[] = [
   },
 ];
 
-export function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("es-MX", {
+export function formatDate(dateStr: string, locale = "es"): string {
+  return new Date(dateStr).toLocaleDateString(locale === "en" ? "en-US" : "es-MX", {
     year: "numeric",
     month: "long",
     day: "numeric",
