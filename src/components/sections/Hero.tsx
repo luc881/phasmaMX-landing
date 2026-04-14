@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { ArrowDown } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -128,11 +129,11 @@ export default function Hero() {
 
           {/* CTAs */}
           <div ref={ctaRef} className="flex items-center gap-6 opacity-0" style={{ opacity: 1 }}>
-            <a href="/es/especies" className="btn-primary">
+            <Link href="/especies" className="btn-primary">
               {t("hero.cta")}
-            </a>
+            </Link>
             <a href="#phasmids-intro" className="btn-outline">
-              Qué son los fásmidos
+              {t("hero.cta_secondary")}
             </a>
           </div>
         </div>

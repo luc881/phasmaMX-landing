@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { ArrowUpRight, BookOpen } from "lucide-react";
 import gsap from "gsap";
@@ -52,7 +52,7 @@ export default function CatalogCTA() {
           {/* Contenido */}
           <div className="lg:col-span-7 flex flex-col justify-center p-10 lg:p-16">
             <p className="cta-reveal font-mono text-caption text-gold uppercase tracking-widest mb-6">
-              Phasmatodea · Catálogo sistemático
+              {t("label")}
             </p>
             <h2 className="cta-reveal font-display text-display-md font-light text-text1 mb-6 text-balance">
               {t("catalog_title")}
@@ -61,12 +61,12 @@ export default function CatalogCTA() {
               {t("catalog_body")}
             </p>
 
-            {/* Stats rápidos */}
+            {/* Quick stats */}
             <div className="cta-reveal flex gap-8 mb-10">
               {[
-                ["Nativas", "120+"],
-                ["Exóticas", "80+"],
-                ["Endémicas", "40+"],
+                [t("stat_native"), "120+"],
+                [t("stat_exotic"), "80+"],
+                [t("stat_endemic"), "40+"],
               ].map(([label, val]) => (
                 <div key={label}>
                   <p className="font-display text-display-sm font-light text-gold mb-1">{val}</p>
@@ -77,11 +77,11 @@ export default function CatalogCTA() {
 
             {/* Botones */}
             <div className="cta-reveal flex flex-wrap gap-4">
-              <Link href="/es/especies" className="btn-primary">
+              <Link href="/especies" className="btn-primary">
                 {t("catalog_btn")}
                 <ArrowUpRight size={14} />
               </Link>
-              <Link href="/es/publicaciones" className="btn-outline">
+              <Link href="/publicaciones" className="btn-outline">
                 <BookOpen size={14} />
                 {t("publications_btn")}
               </Link>

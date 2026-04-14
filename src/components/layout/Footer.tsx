@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 export default function Footer() {
   const t = useTranslations("footer");
@@ -24,18 +24,18 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Links */}
+          {/* Archive links */}
           <div>
             <p className="font-mono text-caption text-text3 uppercase tracking-widest mb-6">
-              Archivo
+              {t("col_archive")}
             </p>
             <nav className="flex flex-col gap-3">
               {[
-                ["Catálogo de especies", "/es/especies"],
-                ["Artículos de divulgación", "/es/articulos"],
-                ["Expediciones de campo", "/es/expediciones"],
-                ["Publicaciones científicas", "/es/publicaciones"],
-              ].map(([label, href]) => (
+                { label: t("links.catalog"),      href: "/especies" },
+                { label: t("links.articles"),     href: "/articulos" },
+                { label: t("links.expeditions"),  href: "/expediciones" },
+                { label: t("links.publications"), href: "/publicaciones" },
+              ].map(({ label, href }) => (
                 <Link
                   key={href}
                   href={href}
@@ -47,17 +47,17 @@ export default function Footer() {
             </nav>
           </div>
 
-          {/* Proyecto */}
+          {/* Project links */}
           <div>
             <p className="font-mono text-caption text-text3 uppercase tracking-widest mb-6">
-              Proyecto
+              {t("col_project")}
             </p>
             <nav className="flex flex-col gap-3">
               {[
-                ["Acerca de Phasma MX", "/es/acerca-de"],
-                ["Colaborar", "/es/colaborar"],
-                ["Contacto", "/es/contacto"],
-              ].map(([label, href]) => (
+                { label: t("links.about"),       href: "/acerca-de" },
+                { label: t("links.collaborate"),  href: "/colaborar" },
+                { label: t("links.contact"),      href: "/contacto" },
+              ].map(({ label, href }) => (
                 <Link
                   key={href}
                   href={href}
