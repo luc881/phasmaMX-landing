@@ -1,29 +1,4 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, DM_Sans, Space_Mono } from "next/font/google";
-import { getLocale } from "next-intl/server";
-import "./globals.css";
-
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  variable: "--font-cormorant",
-  weight: ["300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  display: "swap",
-});
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-dm-sans",
-  weight: ["300", "400", "500", "600"],
-  display: "swap",
-});
-
-const spaceMono = Space_Mono({
-  subsets: ["latin"],
-  variable: "--font-space-mono",
-  weight: ["400", "700"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: {
@@ -40,19 +15,23 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+/**
+ * Layout raíz de paso.
+ *
+ * `<html>` y `<body>` viven en `[locale]/layout.tsx`, no aquí: este layout se
+ * renderiza por encima del segmento `[locale]`, así que la única forma de
+ * conocer el idioma sería `getLocale()`, que lee cabeceras de la petición. Eso
+ * marca todo el árbol como dinámico y en Next 16 dejaba el sitio entero sin
+ * prerenderizar (87 páginas SSG → 0). Tomando el locale de `params` en
+ * `[locale]` el render vuelve a ser estático.
+ *
+ * `not-found.tsx` de raíz cae fuera de `[locale]`, así que aporta su propio
+ * `<html>`/`<body>`.
+ */
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const locale = await getLocale();
-  return (
-    <html lang={locale} suppressHydrationWarning>
-      <body
-        className={`${cormorant.variable} ${dmSans.variable} ${spaceMono.variable}`}
-      >
-        {children}
-      </body>
-    </html>
-  );
+  return children;
 }

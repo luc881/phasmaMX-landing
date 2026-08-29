@@ -2,12 +2,16 @@
  * Root-level not-found — catches 404s outside any [locale] segment.
  * Renders without Header/Footer (no NextIntlClientProvider available here),
  * so it uses inline minimal styling consistent with the design system.
+ * Aporta su propio <html>/<body>: el layout raiz es de paso y quien los
+ * renderiza es [locale]/layout, que no envuelve a esta ruta.
  */
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 export default function RootNotFound() {
   return (
+    <html lang="es">
+      <body style={{ margin: 0 }}>
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem", background: "#0A0A0A" }}>
       <div style={{ textAlign: "center", maxWidth: 480 }}>
         <p style={{ fontFamily: "monospace", fontSize: "0.75rem", letterSpacing: "0.12em", color: "#C8B97A", textTransform: "uppercase", marginBottom: "1.5rem" }}>
@@ -29,5 +33,7 @@ export default function RootNotFound() {
         </Link>
       </div>
     </div>
+      </body>
+    </html>
   );
 }
