@@ -5,13 +5,14 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import CountUp from "@/components/ui/CountUp";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const STATS = [
-  { value: "+3,500", key: "stat_species_world" },
-  { value: "+120", key: "stat_species_mx" },
-  { value: "+40", key: "stat_endemic" },
+  { value: 3500, key: "stat_species_world" },
+  { value: 120, key: "stat_species_mx" },
+  { value: 40, key: "stat_endemic" },
 ];
 
 export default function PhasmidsIntro() {
@@ -70,31 +71,32 @@ export default function PhasmidsIntro() {
     <section
       id="phasmids-intro"
       ref={sectionRef}
-      className="py-24 lg:py-36 border-t border-border"
+      data-surface="paper"
+      className="surface-paper py-24 lg:py-36"
     >
       <div className="container-site">
         {/* Label */}
-        <p className="intro-reveal font-mono text-caption text-text3 uppercase tracking-widest mb-16">
+        <p className="intro-reveal font-mono text-caption text-ink-3 uppercase tracking-widest mb-16">
           Phasmatodea · Biología &amp; Ecología
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">
           {/* Texto editorial */}
           <div className="lg:col-span-6">
-            <h2 className="intro-reveal font-display text-display-md font-light text-text1 mb-8">
+            <h2 className="intro-reveal font-display text-display-md font-light text-void mb-8">
               {t("intro_title")}
             </h2>
 
-            <p className="intro-reveal font-sans text-body-lg text-text2 leading-relaxed mb-6">
+            <p className="intro-reveal font-sans text-body-lg text-ink-2 leading-relaxed mb-6">
               {t("intro_body")}
             </p>
 
-            <p className="intro-reveal font-sans text-body-md text-text2 leading-relaxed mb-12">
+            <p className="intro-reveal font-sans text-body-md text-ink-2 leading-relaxed mb-12">
               {t("intro_body_2")}
             </p>
 
             {/* Pull quote */}
-            <blockquote className="intro-reveal pull-quote mb-12">
+            <blockquote className="intro-reveal pull-quote text-void border-l-gold-dim mb-12">
               Los fásmidos son el resultado de millones de años de coevolución
               con las plantas que los rodean — arquitectura viva.
             </blockquote>
@@ -103,10 +105,10 @@ export default function PhasmidsIntro() {
             <div className="grid grid-cols-3 gap-8">
               {STATS.map((stat) => (
                 <div key={stat.key} className="stat-item">
-                  <p className="font-display text-display-md font-light text-gold mb-1">
-                    {stat.value}
+                  <p className="font-display text-display-md font-light text-gold-dim mb-1">
+                    <CountUp to={stat.value} prefix="+" />
                   </p>
-                  <p className="font-mono text-caption text-text3 uppercase tracking-wide leading-tight">
+                  <p className="font-mono text-caption text-ink-3 uppercase tracking-wide leading-tight">
                     {t(stat.key as any)}
                   </p>
                 </div>
@@ -129,22 +131,24 @@ export default function PhasmidsIntro() {
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
               {/* Overlay sutil */}
-              <div className="absolute inset-0 bg-void/10" />
+              <div className="absolute inset-0 bg-void/5" />
             </div>
 
             {/* Caption científico */}
             <div className="mt-4 flex items-start justify-between">
-              <p className="font-mono text-caption text-text3 italic max-w-xs">
-                Carausius morosus en estado de catalepsia diurna
+              {/* El pie describía una especie que la foto no muestra: es una
+                  imagen de hábitat, no de espécimen. */}
+              <p className="font-mono text-caption text-ink-3 italic max-w-xs">
+                Dosel tropical húmedo — hábitat típico de Phasmatodea
               </p>
-              <p className="font-mono text-caption text-text3 shrink-0">
+              <p className="font-mono text-caption text-ink-3 shrink-0">
                 © Placeholder
               </p>
             </div>
 
             {/* Decorador de número */}
-            <div className="absolute -top-4 -right-4 w-16 h-16 border border-border flex items-center justify-center">
-              <span className="font-mono text-caption text-text3">01</span>
+            <div className="absolute -top-4 -right-4 w-16 h-16 border border-paper-border bg-paper flex items-center justify-center">
+              <span className="font-mono text-caption text-ink-3">01</span>
             </div>
           </div>
         </div>

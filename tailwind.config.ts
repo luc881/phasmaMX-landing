@@ -21,6 +21,17 @@ const config: Config = {
         "gold-dim":"#6B5E3A",
         lichen:    "#4A6741",
         amber:     "#8B6914",
+        // Pliego claro — las secciones impresas sobre papel. Contraste AA
+        // verificado: void 16.1, ink-2 6.5, ink-3 4.6, gold-dim 5.2.
+        // El `gold` normal NO se usa sobre papel (1.6).
+        paper:          "#EDE7DA",
+        "paper-2":      "#E2DACA",
+        "paper-border": "#CFC6B2",
+        "ink-2":        "#57503F",
+        "ink-3":        "#6E6757",
+        // Oro para el cristal claro: sobre translúcido el `gold-dim` cae a
+        // 3.75. Este da 5.2 ahí y 7.2 sobre papel sólido.
+        "gold-ink":     "#554924",
       },
       fontFamily: {
         display:    ["var(--font-cormorant)", "Georgia", "serif"],
@@ -82,6 +93,7 @@ const config: Config = {
       animation: {
         "fade-in": "fadeIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards",
         "slide-up": "slideUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards",
+        "marquee": "marquee 70s linear infinite",
       },
       keyframes: {
         fadeIn: {
@@ -91,6 +103,11 @@ const config: Config = {
         slideUp: {
           from: { opacity: "0", transform: "translateY(40px)" },
           to:   { opacity: "1", transform: "translateY(0)" },
+        },
+        // La banda duplica su contenido, así que -50% es un bucle sin costura.
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to:   { transform: "translateX(-50%)" },
         },
       },
     },

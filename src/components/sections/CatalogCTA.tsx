@@ -34,9 +34,13 @@ export default function CatalogCTA() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-24 lg:py-36 border-t border-border">
+    <section
+      ref={sectionRef}
+      data-surface="paper"
+      className="surface-paper py-24 lg:py-36"
+    >
       <div className="container-site">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 bg-surface border border-border overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 bg-paper-2 border border-paper-border overflow-hidden">
           {/* Imagen lateral */}
           <div className="lg:col-span-5 relative overflow-hidden" style={{ minHeight: 360 }}>
             <Image
@@ -46,18 +50,18 @@ export default function CatalogCTA() {
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 40vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-surface lg:bg-gradient-to-r" />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-paper-2 lg:bg-gradient-to-r" />
           </div>
 
           {/* Contenido */}
           <div className="lg:col-span-7 flex flex-col justify-center p-10 lg:p-16">
-            <p className="cta-reveal font-mono text-caption text-gold uppercase tracking-widest mb-6">
+            <p className="cta-reveal font-mono text-caption text-gold-dim uppercase tracking-widest mb-6">
               {t("label")}
             </p>
-            <h2 className="cta-reveal font-display text-display-md font-light text-text1 mb-6 text-balance">
+            <h2 className="cta-reveal font-display text-display-md font-light text-void mb-6 text-balance">
               {t("catalog_title")}
             </h2>
-            <p className="cta-reveal font-sans text-body-lg text-text2 leading-relaxed mb-10 max-w-lg">
+            <p className="cta-reveal font-sans text-body-lg text-ink-2 leading-relaxed mb-10 max-w-lg">
               {t("catalog_body")}
             </p>
 
@@ -69,19 +73,19 @@ export default function CatalogCTA() {
                 [t("stat_endemic"), "40+"],
               ].map(([label, val]) => (
                 <div key={label}>
-                  <p className="font-display text-display-sm font-light text-gold mb-1">{val}</p>
-                  <p className="font-mono text-caption text-text3 uppercase tracking-wide">{label}</p>
+                  <p className="font-display text-display-sm font-light text-gold-dim mb-1">{val}</p>
+                  <p className="font-mono text-caption text-ink-3 uppercase tracking-wide">{label}</p>
                 </div>
               ))}
             </div>
 
             {/* Botones */}
             <div className="cta-reveal flex flex-wrap gap-4">
-              <Link href="/especies" className="btn-primary">
+              <Link href="/especies" className="btn-primary-ink">
                 {t("catalog_btn")}
                 <ArrowUpRight size={14} />
               </Link>
-              <Link href="/publicaciones" className="btn-outline">
+              <Link href="/publicaciones" className="btn-outline-ink">
                 <BookOpen size={14} />
                 {t("publications_btn")}
               </Link>

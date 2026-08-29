@@ -9,25 +9,54 @@ type Props = {
   locale: string;
 };
 
+/** Punto de sondeo: mitad del header (64px en móvil, 80px en escritorio). */
+const PROBE_Y = 40;
+
 export default function Header({ locale }: Props) {
   const t = useTranslations("nav");
   const tSearch = useTranslations("search");
   const pathname = usePathname();
-  const [scrolled, setScrolled] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [onPaper, setOnPaper] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
+    const onScroll = () => {
+      const y = window.scrollY;
+
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(max > 0 ? Math.min(y / max, 1) : 0);
+
+      // ¿Qué hay detrás de la barra ahora mismo? Ocho secciones como mucho,
+      // así que recorrerlas sale más barato que montar un observer.
+      const bands = document.querySelectorAll('[data-surface="paper"]');
+      let paper = false;
+      for (const band of bands) {
+        const r = band.getBoundingClientRect();
+        if (r.top <= PROBE_Y && r.bottom >= PROBE_Y) {
+          paper = true;
+          break;
+        }
+      }
+      setOnPaper(paper);
+    };
+
+    // Al recargar a media página el header ya nace en su estado correcto.
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Estructura de secciones del sitio. Artículos y Expediciones quedan dentro
+  // de Publicaciones y Eventos respectivamente, y siguen en el pie.
   const navLinks = [
     { href: "/especies", label: t("species") },
-    { href: "/articulos", label: t("articles") },
-    { href: "/expediciones", label: t("expeditions") },
     { href: "/publicaciones", label: t("publications") },
+    { href: "/crianza", label: t("breeding") },
+    { href: "/fotografias", label: t("photos") },
+    { href: "/eventos", label: t("events") },
     { href: "/acerca-de", label: t("about") },
+    { href: "/contacto", label: t("contact") },
   ];
 
   const altLocale = locale === "es" ? "en" : "es";
@@ -37,37 +66,56 @@ export default function Header({ locale }: Props) {
     window.dispatchEvent(new CustomEvent("phasma:open-search"));
   }
 
+  // La barra siempre contrasta contra lo que tiene detrás: cristal oscuro
+  // sobre el pliego claro, cristal claro sobre las secciones oscuras.
+  // 85% de opacidad es el punto donde ambos siguen pasando AA.
+  const glass = "backdrop-blur-md backdrop-saturate-150";
+
+  const barTone = onPaper
+    ? "bg-void/85 border-b border-text1/15"
+    : "bg-paper/85 border-b border-ink-2/20";
+
+  const pillTone = onPaper
+    ? "border-text1/25 text-text2 hover:border-gold hover:text-text1"
+    : "border-ink-2/30 text-ink-2 hover:border-gold-ink hover:text-void";
+
+  const wordmarkTone = onPaper ? "text-text1" : "text-void";
+  // Sobre cristal claro el gold-dim cae a 3.75; gold-ink lo sube a 5.2.
+  const submarkTone = onPaper ? "text-gold" : "text-gold-ink";
+  const quietTone = onPaper
+    ? "text-text3 hover:text-text1"
+    : "text-ink-2 hover:text-void";
+  const progressTone = onPaper ? "bg-gold" : "bg-gold-ink";
+  const trackTone = onPaper ? "bg-text1/20" : "bg-ink-2/20";
+
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-600 ${
-          scrolled
-            ? "bg-void/95 backdrop-blur-sm border-b border-border"
-            : "bg-transparent"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-600 ${glass} ${barTone}`}
       >
         <div className="container-site">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+          <div className="flex items-center justify-between h-16 lg:h-20 gap-4">
             {/* Logo */}
-            <Link
-              href="/"
-              className="flex flex-col leading-none group"
-            >
-              <span className="font-display text-lg font-light tracking-[0.15em] text-text1 uppercase">
+            <Link href="/" className="flex flex-col leading-none group shrink-0">
+              <span
+                className={`font-display text-lg font-light tracking-[0.15em] uppercase transition-colors duration-600 ${wordmarkTone}`}
+              >
                 Phasma
               </span>
-              <span className="font-mono text-caption text-gold tracking-widest">
+              <span
+                className={`font-mono text-caption tracking-widest transition-colors duration-600 ${submarkTone}`}
+              >
                 MX · PHASMATODEA
               </span>
             </Link>
 
-            {/* Nav desktop */}
-            <nav className="hidden lg:flex items-center gap-8">
+            {/* Nav desktop — botones visibles desde lo más alto */}
+            <nav className="hidden xl:flex items-center gap-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="font-sans text-caption uppercase tracking-widest text-text2 hover:text-text1 transition-colors duration-400"
+                  className={`border px-3 py-2 font-sans text-caption uppercase tracking-widest transition-colors duration-400 ${pillTone}`}
                 >
                   {link.label}
                 </Link>
@@ -75,27 +123,30 @@ export default function Header({ locale }: Props) {
             </nav>
 
             {/* Search + locale switcher + hamburger */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 shrink-0">
               <button
                 onClick={openSearch}
-                className="flex items-center gap-2 font-mono text-caption text-text3 hover:text-text1 transition-colors duration-300 border border-border/60 hover:border-border px-3 py-1.5 hidden sm:flex"
+                className={`hidden sm:flex items-center gap-2 border px-3 py-2 font-mono text-caption transition-colors duration-400 ${pillTone}`}
                 aria-label={tSearch("open_label")}
               >
                 <Search size={12} />
-                <span className="hidden lg:inline tracking-widest uppercase" style={{ fontSize: "10px" }}>
+                <span
+                  className="hidden lg:inline tracking-widest uppercase"
+                  style={{ fontSize: "10px" }}
+                >
                   ⌘K
                 </span>
               </button>
               <Link
                 href={pathname}
                 locale={altLocale as "es" | "en"}
-                className="font-mono text-caption text-text3 hover:text-gold transition-colors duration-400 tracking-widest"
+                className={`border px-3 py-2 font-mono text-caption tracking-widest transition-colors duration-400 ${pillTone}`}
               >
                 {altLabel}
               </Link>
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
-                className="lg:hidden text-text2 hover:text-text1 transition-colors"
+                className={`xl:hidden transition-colors duration-400 ${quietTone}`}
                 aria-label="Menu"
               >
                 {menuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -103,11 +154,22 @@ export default function Header({ locale }: Props) {
             </div>
           </div>
         </div>
+
+        {/* Avance de lectura: el canto inferior del header se llena de oro
+            conforme baja la página, y le da un borde definido desde arriba. */}
+        <div
+          className={`absolute bottom-0 left-0 right-0 h-px transition-colors duration-600 ${trackTone}`}
+        >
+          <div
+            className={`h-full origin-left transition-colors duration-600 ${progressTone}`}
+            style={{ transform: `scaleX(${progress})` }}
+          />
+        </div>
       </header>
 
       {/* Mobile menu */}
       <div
-        className={`fixed inset-0 z-40 bg-void/98 backdrop-blur-sm transition-all duration-600 lg:hidden ${
+        className={`fixed inset-0 z-40 bg-void/98 backdrop-blur-sm transition-all duration-600 xl:hidden ${
           menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       >

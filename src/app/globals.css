@@ -16,6 +16,14 @@
     --color-gold-dim:  #6B5E3A;
     --color-lichen:    #4A6741;
     --color-amber:     #8B6914;
+
+    /* Pliego claro — secciones impresas sobre papel */
+    --color-paper:        #EDE7DA;
+    --color-paper-2:      #E2DACA;
+    --color-paper-border: #CFC6B2;
+    --color-ink-2:        #57503F;
+    --color-ink-3:        #6E6757;
+    --color-gold-ink:     #554924;
   }
 
   *,
@@ -148,6 +156,48 @@
   .btn-outline:hover {
     color: var(--color-text-1);
     border-color: var(--color-border-2);
+  }
+
+  /* ---- Pliego claro: mismas piezas, impresas sobre papel ---- */
+
+  /* Marca una sección como papel: fondo y color base del texto. */
+  .surface-paper {
+    background: var(--color-paper);
+    color: var(--color-void);
+  }
+
+  .btn-primary-ink {
+    @apply inline-flex items-center gap-2 font-sans text-caption uppercase tracking-widest;
+    color: var(--color-paper);
+    background: var(--color-void);
+    padding: 12px 24px;
+    border: 1px solid var(--color-void);
+    transition: all 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .btn-primary-ink:hover {
+    background: transparent;
+    color: var(--color-void);
+  }
+
+  .btn-outline-ink {
+    @apply inline-flex items-center gap-2 font-sans text-caption uppercase tracking-widest;
+    color: var(--color-ink-2);
+    border: 1px solid var(--color-paper-border);
+    padding: 12px 24px;
+    transition: all 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .btn-outline-ink:hover {
+    color: var(--color-void);
+    border-color: var(--color-ink-3);
+  }
+
+  /* Badge taxonómico sobre papel */
+  .taxonomy-badge-ink {
+    @apply inline-block font-mono text-caption uppercase tracking-widest;
+    color: var(--color-gold-dim);
+    border: 1px solid var(--color-paper-border);
+    padding: 2px 8px;
+    letter-spacing: 0.12em;
   }
 
   /* Número de catálogo */

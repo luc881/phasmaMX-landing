@@ -78,7 +78,7 @@ export default function Hero() {
       {/* Imagen protagonista */}
       <div ref={imageRef} className="absolute inset-0 will-change-transform">
         <Image
-          src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1920&q=85&fit=crop"
+          src="https://images.unsplash.com/photo-1686076620192-4994fc2ede3f?w=1920&q=85&fit=crop"
           alt="Insecto palo sobre rama — Phasmatodea"
           fill
           priority
@@ -93,7 +93,10 @@ export default function Hero() {
       <div className="absolute inset-0 bg-gradient-to-r from-void/70 via-void/20 to-transparent" />
 
       {/* Contenido sobre la imagen */}
-      <div className="relative z-10 w-full container-site pb-20 lg:pb-28">
+      {/* pt- reserva el alto del header: cuando el contenido crece más que la
+          pantalla, `items-end` deja de protegerlo y el badge se metía debajo
+          de la barra fija. */}
+      <div className="relative z-10 w-full container-site pt-28 lg:pt-32 pb-20 lg:pb-28">
         <div className="max-w-4xl">
           {/* Label taxonómico */}
           <p
