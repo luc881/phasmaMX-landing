@@ -18,22 +18,6 @@ export default defineType({
       options: { source: "name" },
     }),
     defineField({
-      name: "role",
-      title: "Rol (categoría interna)",
-      type: "string",
-      description:
-        "Categoría interna para filtrar/organizar autores en el Studio. El " +
-        "cargo que se muestra públicamente junto al nombre va en \"Cargo\" abajo.",
-      options: {
-        list: [
-          { title: "Biólogo / Investigador", value: "biologist" },
-          { title: "Fotógrafo", value: "photographer" },
-          { title: "Colaborador externo", value: "external" },
-          { title: "Editor", value: "editor" },
-        ],
-      },
-    }),
-    defineField({
       name: "roleLabel",
       title: "Cargo (texto público)",
       type: "string",

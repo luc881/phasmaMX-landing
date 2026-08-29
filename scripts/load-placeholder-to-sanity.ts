@@ -195,9 +195,8 @@ async function buildAuthorDoc(author: ArticleAuthor) {
     _type: "author",
     name: author.name,
     slug: { _type: "slug", current: slug },
-    // `role` del esquema es una categoría interna (biologist/photographer/...)
-    // sin equivalente en el placeholder; se deja vacío. `roleLabel` es el
-    // cargo público que sí trae el placeholder.
+    // El `role` del placeholder es texto libre ("Editora científica"), que es
+    // justo lo que `roleLabel` publica junto a la firma.
     roleLabel: author.role,
     initials: author.initials,
   };
@@ -267,14 +266,10 @@ async function buildSpeciesDoc(sp: SpeciesPlaceholder) {
     taxonomicAuthor: sp.author,
     year: sp.year,
     geographicOrigin: sp.geographicOrigin,
-    presenceInMexico: {
-      present: sp.presenceInMexico,
-      // El placeholder no tiene un booleano "nativa" explícito; se deriva de
-      // la etiqueta "nativa" que ya usan las especies mexicanas del catálogo.
-      native: sp.tags?.includes("nativa") ?? false,
-      // `states` (heredado) se deja vacío a propósito: el esquema indica que
-      // la lista viva es `mexicoStates`, no duplicarla aquí.
-    },
+    presenceInMexico: sp.presenceInMexico,
+    // El placeholder no tiene un booleano "nativa" explícito; se deriva de la
+    // etiqueta "nativa" que ya usan las especies mexicanas del catálogo.
+    nativeToMexico: sp.tags?.includes("nativa") ?? false,
     mexicoStates: sp.mexicoStates,
     mexicoLocations,
     gallery,
@@ -346,12 +341,17 @@ async function buildArticleDoc(article: ArticlePlaceholder, authorIdByName: Map<
     doc.mainImage = { _type: "image", asset: mainImageRef, caption: article.imageCaption };
   }
 
+  // Referencias débiles a propósito: los `_id` son deterministas, así que el
+  // destino puede no existir todavía cuando se escribe este documento, y una
+  // referencia fuerte fallaría. Además evita que borrar un artículo quede
+  // bloqueado porque otro lo enlaza.
   if (article.relatedSlugs.length) {
-    console.warn(
-      `  aviso: "${article.slug}".relatedSlugs (${article.relatedSlugs.join(", ")}) no se sube — ` +
-        `el esquema "article" sólo tiene "relatedSpecies" (referencias a especies); no existe un ` +
-        `campo de artículos relacionados. Ver informe.`,
-    );
+    doc.relatedArticles = article.relatedSlugs.map((slug) => ({
+      _type: "reference",
+      _ref: `article-${slug}`,
+      _weak: true,
+      _key: slug,
+    }));
   }
 
   return doc;

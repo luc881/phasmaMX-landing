@@ -130,6 +130,16 @@ export default defineType({
       of: [{ type: "string" }],
     }),
     defineField({
+      name: "relatedArticles",
+      title: "Artículos relacionados",
+      type: "array",
+      of: [{ type: "reference", to: [{ type: "article" }] }],
+      description:
+        "Otros artículos del archivo. El sitio ya pinta este bloque al pie de " +
+        "cada artículo; sin este campo no habría de dónde sacarlo.",
+      validation: (rule) => rule.unique().max(4),
+    }),
+    defineField({
       name: "relatedSpecies",
       title: "Especies relacionadas",
       type: "array",

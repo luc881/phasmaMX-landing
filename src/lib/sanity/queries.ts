@@ -13,8 +13,8 @@ import { groq } from "next-sanity";
  * 2. `aspectRatio` no se almacena — se deriva de los metadatos del asset. Sale
  *    como número (0.75), no como el string "3/4" del placeholder; CSS acepta
  *    ambos en `aspect-ratio`.
- * 3. `presenceInMexico` es un objeto en Sanity y un booleano en el placeholder:
- *    se aplana a `presenceInMexico.present`.
+ * 3. `presenceInMexico` es un booleano en ambos lados; `nativeToMexico` va
+ *    aparte porque una especie puede estar presente sin ser nativa.
  *
  * Divergencia que SÍ requiere trabajo en el componente: `description` es
  * Portable Text (array de bloques) en Sanity y string plano en el placeholder.
@@ -37,13 +37,14 @@ const SPECIES_CARD_FIELDS = /* groq */ `
   catalogNum,
   conservationStatus,
   geographicOrigin,
-  "presenceInMexico": coalesce(presenceInMexico.present, false),
-  "mexicoStates": coalesce(mexicoStates, presenceInMexico.states, []),
+  "presenceInMexico": coalesce(presenceInMexico, false),
+  nativeToMexico,
+  "mexicoStates": coalesce(mexicoStates, []),
   "image": mainImage.asset->url,
   "imageAlt": mainImage.alt,
   "aspectRatio": mainImage.asset->metadata.dimensions.aspectRatio,
   "tags": coalesce(tags, []),
-  "tagsEn": coalesce(tagsEn, [])
+  psgNumber
 `;
 
 /** Localidades con las coordenadas ya en el orden que espera el mapa. */
@@ -78,6 +79,15 @@ export const speciesDetailQuery = groq`
     descriptionEn,
     habitat,
     behavior,
+    tribe,
+    "synonyms": coalesce(synonyms, []),
+    typeLocality,
+    bodyLengthFemaleMm,
+    bodyLengthMaleMm,
+    parthenogenetic,
+    rearingDifficulty,
+    incubationMonthsMin,
+    incubationMonthsMax,
     "foodPlants": coalesce(foodPlants, []),
     "foodPlantsEn": coalesce(foodPlantsEn, []),
     females,
@@ -100,7 +110,7 @@ export const speciesDetailQuery = groq`
     publishedAt,
     author-> {
       name,
-      "role": coalesce(roleLabel, role),
+      roleLabel,
       bio,
       initials,
       "photo": photo.asset->url
@@ -131,7 +141,7 @@ const ARTICLE_CARD_FIELDS = /* groq */ `
   "tags": coalesce(tags, []),
   author-> {
     name,
-    "role": coalesce(roleLabel, role),
+    roleLabel,
     initials
   }
 `;
@@ -155,7 +165,7 @@ export const articleDetailQuery = groq`
     bodyEn,
     author-> {
       name,
-      "role": coalesce(roleLabel, role),
+      roleLabel,
       bio,
       initials,
       "photo": photo.asset->url
@@ -180,6 +190,7 @@ export const searchIndexQuery = groq`{
     commonNameEn,
     family,
     catalogNum,
+    psgNumber,
     "tags": coalesce(tags, [])
   },
   "articles": *[_type == "article"] | order(publishedAt desc) {
