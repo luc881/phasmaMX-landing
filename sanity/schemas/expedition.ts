@@ -7,9 +7,14 @@ export default defineType({
   fields: [
     defineField({
       name: "title",
-      title: "Título de la expedición",
+      title: "Título de la expedición (español)",
       type: "string",
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "titleEn",
+      title: "Expedition title (English)",
+      type: "string",
     }),
     defineField({
       name: "slug",
@@ -56,6 +61,10 @@ export default defineType({
       title: "Imagen principal",
       type: "image",
       options: { hotspot: true },
+      fields: [
+        defineField({ name: "alt", type: "string", title: "Texto alternativo" }),
+        defineField({ name: "credit", type: "string", title: "Crédito fotográfico" }),
+      ],
     }),
     defineField({
       name: "gallery",
@@ -75,7 +84,13 @@ export default defineType({
     }),
     defineField({
       name: "fieldNotes",
-      title: "Notas de campo",
+      title: "Notas de campo (español)",
+      type: "array",
+      of: [{ type: "block" }],
+    }),
+    defineField({
+      name: "fieldNotesEn",
+      title: "Field notes (English)",
       type: "array",
       of: [{ type: "block" }],
     }),

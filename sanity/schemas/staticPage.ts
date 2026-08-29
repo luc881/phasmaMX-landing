@@ -25,7 +25,13 @@ export default defineType({
     }),
     defineField({
       name: "seoDescription",
-      title: "Meta descripción SEO",
+      title: "Meta descripción SEO (español)",
+      type: "text",
+      rows: 2,
+    }),
+    defineField({
+      name: "seoDescriptionEn",
+      title: "SEO meta description (English)",
       type: "text",
       rows: 2,
     }),

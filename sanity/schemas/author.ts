@@ -19,8 +19,11 @@ export default defineType({
     }),
     defineField({
       name: "role",
-      title: "Rol",
+      title: "Rol (categoría interna)",
       type: "string",
+      description:
+        "Categoría interna para filtrar/organizar autores en el Studio. El " +
+        "cargo que se muestra públicamente junto al nombre va en \"Cargo\" abajo.",
       options: {
         list: [
           { title: "Biólogo / Investigador", value: "biologist" },
@@ -29,6 +32,23 @@ export default defineType({
           { title: "Editor", value: "editor" },
         ],
       },
+    }),
+    defineField({
+      name: "roleLabel",
+      title: "Cargo (texto público)",
+      type: "string",
+      description:
+        "El cargo tal como se muestra en la firma de artículos y fichas, ej. " +
+        "\"Investigador asociado\" o \"Especialista en terrariofilia\". Texto " +
+        "libre, distinto de la categoría interna de arriba.",
+    }),
+    defineField({
+      name: "initials",
+      title: "Iniciales",
+      type: "string",
+      description:
+        "Iniciales cortas para el avatar cuando no hay fotografía, ej. \"MV\".",
+      validation: (rule) => rule.max(3),
     }),
     defineField({
       name: "bio",

@@ -47,8 +47,13 @@ export default defineType({
           { title: "Expedición", value: "expedition" },
           { title: "Divulgación", value: "outreach" },
           { title: "Especie del mes", value: "species-of-month" },
+          { title: "Terrariofilia", value: "care" },
         ],
       },
+      // Nota: la opción "ecology" (Ecología) que ya existía aquí no aparece en
+      // ningún artículo del placeholder. Se deja porque no hace daño, pero
+      // conviene confirmar con la editora si es una categoría real o un
+      // resto sin usar antes de publicar contenido con ella.
     }),
     defineField({
       name: "mainImage",
@@ -58,7 +63,15 @@ export default defineType({
       fields: [
         defineField({ name: "alt", type: "string", title: "Texto alternativo" }),
         defineField({ name: "credit", type: "string", title: "Crédito" }),
+        defineField({ name: "caption", type: "string", title: "Pie de foto" }),
       ],
+    }),
+    defineField({
+      name: "readingMinutes",
+      title: "Minutos de lectura",
+      type: "number",
+      description: "Tiempo estimado de lectura en minutos, se muestra junto a la fecha.",
+      validation: (rule) => rule.integer().positive(),
     }),
     defineField({
       name: "excerpt",
