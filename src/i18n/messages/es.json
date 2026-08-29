@@ -5,7 +5,11 @@
     "expeditions": "Expediciones",
     "publications": "Publicaciones",
     "about": "Acerca de",
-    "catalog": "Catálogo completo"
+    "catalog": "Catálogo completo",
+    "breeding": "Crianza",
+    "photos": "Fotografías",
+    "events": "Eventos",
+    "contact": "Contacto"
   },
   "hero": {
     "tagline": "El archivo definitivo de Phasmatodea en México y América Latina",
@@ -18,7 +22,12 @@
     "what_are_phasmids": "Qué son los fásmidos",
     "latest_articles": "Últimos artículos",
     "distribution": "Distribución en México",
-    "explore_catalog": "Catálogo de especies"
+    "explore_catalog": "Catálogo de especies",
+    "archive_label": "Archivo vivo · Registro continuo",
+    "archive_count": "{species} especies · {articles} artículos",
+    "rule_updated_label": "Última actualización",
+    "rule_coverage_label": "Cobertura geográfica",
+    "rule_coverage_value": "{states} estados · {records} registros"
   },
   "phasmids": {
     "intro_title": "Maestros del camuflaje",
@@ -77,7 +86,10 @@
       "publications": "Publicaciones científicas",
       "about": "Acerca de Phasma MX",
       "collaborate": "Colaborar",
-      "contact": "Contacto"
+      "contact": "Contacto",
+      "breeding": "Guía de crianza",
+      "photos": "Fotografías",
+      "events": "Eventos"
     }
   },
   "catalog": {

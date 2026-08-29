@@ -13,7 +13,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ["", 1.0, "weekly"],
     ["/especies", 0.9, "weekly"],
     ["/articulos", 0.8, "weekly"],
+    ["/publicaciones", 0.7, "monthly"],
+    ["/publicaciones/phasmida-de-mexico", 0.6, "monthly"],
+    ["/publicaciones/propias", 0.6, "monthly"],
+    ["/crianza", 0.7, "monthly"],
+    ["/crianza/antes-de-empezar", 0.6, "monthly"],
+    ["/crianza/el-terrario", 0.6, "monthly"],
+    ["/crianza/alimentacion", 0.6, "monthly"],
+    ["/crianza/incubacion", 0.6, "monthly"],
+    ["/fotografias", 0.7, "monthly"],
+    ["/fotografias/insectos", 0.6, "monthly"],
+    ["/fotografias/eventos", 0.6, "monthly"],
+    ["/eventos", 0.7, "weekly"],
+    ["/expediciones", 0.6, "monthly"],
     ["/acerca-de", 0.5, "monthly"],
+    ["/colaborar", 0.5, "monthly"],
+    ["/contacto", 0.5, "monthly"],
   ];
 
   const staticEntries = staticRoutes.flatMap(([path, priority, changeFrequency]) =>

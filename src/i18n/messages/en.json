@@ -5,7 +5,11 @@
     "expeditions": "Expeditions",
     "publications": "Publications",
     "about": "About",
-    "catalog": "Full catalog"
+    "catalog": "Full catalog",
+    "breeding": "Breeding",
+    "photos": "Photography",
+    "events": "Events",
+    "contact": "Contact"
   },
   "hero": {
     "tagline": "The definitive archive of Phasmatodea in Mexico and Latin America",
@@ -18,7 +22,12 @@
     "what_are_phasmids": "What are phasmids",
     "latest_articles": "Latest articles",
     "distribution": "Distribution in Mexico",
-    "explore_catalog": "Species catalog"
+    "explore_catalog": "Species catalog",
+    "archive_label": "Living archive · Continuous record",
+    "archive_count": "{species} species · {articles} articles",
+    "rule_updated_label": "Last updated",
+    "rule_coverage_label": "Geographic coverage",
+    "rule_coverage_value": "{states} states · {records} records"
   },
   "phasmids": {
     "intro_title": "Masters of camouflage",
@@ -77,7 +86,10 @@
       "publications": "Scientific publications",
       "about": "About Phasma MX",
       "collaborate": "Collaborate",
-      "contact": "Contact"
+      "contact": "Contact",
+      "breeding": "Breeding guide",
+      "photos": "Photography",
+      "events": "Events"
     }
   },
   "catalog": {

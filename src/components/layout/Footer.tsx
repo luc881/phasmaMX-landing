@@ -33,8 +33,11 @@ export default function Footer() {
               {[
                 { label: t("links.catalog"),      href: "/especies" },
                 { label: t("links.articles"),     href: "/articulos" },
-                { label: t("links.expeditions"),  href: "/expediciones" },
                 { label: t("links.publications"), href: "/publicaciones" },
+                { label: t("links.breeding"),     href: "/crianza" },
+                { label: t("links.photos"),       href: "/fotografias" },
+                { label: t("links.events"),       href: "/eventos" },
+                { label: t("links.expeditions"),  href: "/expediciones" },
               ].map(({ label, href }) => (
                 <Link
                   key={href}
