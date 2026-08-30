@@ -20,8 +20,6 @@ export type SpeciesPreviewData = {
   src: string | null;
   alt: string;
   catalogNum?: string;
-  /** ancho/alto del original. Sale de los metadatos del asset en Sanity. */
-  aspectRatio?: number | null;
 };
 
 export type SpeciesHoverPreviewHandle = {
@@ -35,19 +33,15 @@ export type SpeciesHoverPreviewHandle = {
   hide: () => void;
 };
 
-const WIDTH = 300;
-const FALLBACK_RATIO = 2 / 3; // ancho/alto, para cuando no hay foto ni metadatos
-const MAX_HEIGHT = 520; // un original muy alargado no debe ocupar la pantalla entera
+const WIDTH = 320;
+const HEIGHT = 260;
 
 /**
- * La caja se adapta a la proporción real de la fotografía en vez de forzar un
- * 2:3 fijo. Con un recorte fijo, una foto apaisada —que las hay— salía cortada
- * por los lados justo por el eje largo del insecto, que es lo que interesa ver.
+ * Caja de tamaño fijo: cajas de alto variable saltaban de una fila a otra y se
+ * leía como un fallo. La foto va con `object-contain` dentro, así que entra
+ * entera —vertical, cuadrada o apaisada— sin recortarse por el eje largo del
+ * insecto, que es justo lo que hay que ver.
  */
-function boxHeight(ratio: number | null | undefined) {
-  const r = ratio && ratio > 0 ? ratio : FALLBACK_RATIO;
-  return Math.round(Math.min(WIDTH / r, MAX_HEIGHT));
-}
 const CURSOR_OFFSET = 28;
 const EDGE_MARGIN = 12;
 const LERP_FACTOR = 0.18;
@@ -67,10 +61,6 @@ const SpeciesHoverPreview = forwardRef<SpeciesHoverPreviewHandle>((_props, ref) 
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTouch = useRef(false);
   const reducedMotion = useRef(false);
-  // El alto depende de la proporción de cada foto, y `place()` lo necesita para
-  // no dejar la caja fuera de pantalla. En un ref porque se consulta dentro del
-  // bucle de rAF, donde leer estado daría el valor del render anterior.
-  const heightRef = useRef(boxHeight(null));
 
   useEffect(() => {
     // Puntero sin precisión fina (touch) → esto es decoración de escritorio,
@@ -84,11 +74,10 @@ const SpeciesHoverPreview = forwardRef<SpeciesHoverPreviewHandle>((_props, ref) 
     let py = y + CURSOR_OFFSET;
     // Si no cabe a la derecha/abajo, se coloca al otro lado del cursor.
     if (px + WIDTH + EDGE_MARGIN > window.innerWidth) px = x - CURSOR_OFFSET - WIDTH;
-    const h = heightRef.current;
-    if (py + h + EDGE_MARGIN > window.innerHeight) py = y - CURSOR_OFFSET - h;
+    if (py + HEIGHT + EDGE_MARGIN > window.innerHeight) py = y - CURSOR_OFFSET - HEIGHT;
     // Cinturón de seguridad: nunca se sale de la ventana.
     px = Math.min(Math.max(px, EDGE_MARGIN), window.innerWidth - WIDTH - EDGE_MARGIN);
-    py = Math.min(Math.max(py, EDGE_MARGIN), window.innerHeight - h - EDGE_MARGIN);
+    py = Math.min(Math.max(py, EDGE_MARGIN), window.innerHeight - HEIGHT - EDGE_MARGIN);
     return { x: px, y: py };
   }, []);
 
@@ -120,7 +109,6 @@ const SpeciesHoverPreview = forwardRef<SpeciesHoverPreviewHandle>((_props, ref) 
           clearTimeout(hideTimeout.current);
           hideTimeout.current = null;
         }
-        heightRef.current = boxHeight(data.aspectRatio);
         setItem(data);
         setVisible(true);
 
@@ -182,7 +170,7 @@ const SpeciesHoverPreview = forwardRef<SpeciesHoverPreviewHandle>((_props, ref) 
       className={`fixed left-0 top-0 z-50 overflow-hidden rounded border border-border bg-surface pointer-events-none transition-opacity duration-300 ease-out ${
         visible ? "opacity-100" : "opacity-0"
       }`}
-      style={{ width: WIDTH, height: boxHeight(item?.aspectRatio), willChange: "transform" }}
+      style={{ width: WIDTH, height: HEIGHT, willChange: "transform" }}
     >
       {item?.src ? (
         <Image
@@ -191,7 +179,7 @@ const SpeciesHoverPreview = forwardRef<SpeciesHoverPreviewHandle>((_props, ref) 
           alt={item.alt}
           fill
           sizes={`${WIDTH}px`}
-          className="object-cover"
+          className="object-contain"
         />
       ) : (
         <div className="absolute inset-0 flex items-center justify-center bg-surface px-4 text-center">

@@ -14,7 +14,6 @@ import {
 import SpeciesHoverPreview, {
   type SpeciesHoverPreviewHandle,
 } from "./SpeciesHoverPreview";
-import { WAVE_ROW_ATTR, useScrollWave } from "./useScrollWave";
 
 const SORT_KEYS: SortKey[] = [
   "family",
@@ -42,7 +41,6 @@ export default function SpeciesIndex({
   const t = useTranslations("catalog");
   const [sort, setSort] = useState<SortKey>("family");
   const previewRef = useRef<SpeciesHoverPreviewHandle>(null);
-  const waveRef = useScrollWave();
 
   const grouped = sort === "family";
 
@@ -60,7 +58,7 @@ export default function SpeciesIndex({
     s.scientificName;
 
   return (
-    <div ref={waveRef}>
+    <div>
       {/* Selector de orden */}
       <div className="container-site flex items-center gap-3 flex-wrap py-6">
         <span className="font-mono text-caption uppercase tracking-widest text-text3">
@@ -91,8 +89,11 @@ export default function SpeciesIndex({
         ))}
       </div>
 
-      {/* Cabecera de columnas: se queda pegada bajo la barra de filtros */}
-      <div className="sticky top-[7.5rem] z-20 bg-void/95 backdrop-blur-sm border-y border-border">
+      {/* No es pegajosa a propósito: encadenada bajo el header y la barra de
+          filtros habría que cuadrar tres alturas a mano, y cualquier cambio de
+          padding vuelve a solaparlas. Con la familia repetida en cada fila, el
+          encabezado no hace falta a media tabla. */}
+      <div className="border-y border-border">
         <div className="container-site grid grid-cols-[5.5rem_1fr] md:grid-cols-[5.5rem_minmax(0,1.4fr)_minmax(0,1fr)_9rem_3rem] gap-4 py-2.5 font-mono text-caption uppercase tracking-widest text-text3">
           <span>{t("col_catalog")}</span>
           <span>{t("col_species")}</span>
@@ -118,7 +119,6 @@ export default function SpeciesIndex({
             return (
               <Link
                 key={s.id}
-                {...{ [WAVE_ROW_ATTR]: "" }}
                 href={`/especies/${s.slug}`}
                 onMouseEnter={(e) =>
                   previewRef.current?.show(
@@ -126,7 +126,6 @@ export default function SpeciesIndex({
                       src: s.image,
                       alt: `${s.scientificName} — ${commonName(s)}`,
                       catalogNum: s.catalogNum ?? undefined,
-                      aspectRatio: s.aspectRatio,
                     },
                     e
                   )

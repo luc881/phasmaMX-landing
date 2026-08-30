@@ -118,7 +118,7 @@ export default function CatalogGrid({ species }: { species: Species[] }) {
   return (
     <div>
       {/* ── Filter bar ── */}
-      <div className="sticky top-16 z-30 bg-void/95 backdrop-blur-sm border-b border-border">
+      <div className="sticky top-16 lg:top-20 z-30 bg-void/95 backdrop-blur-sm border-b border-border">
         <div className="container-site py-4">
           <div className="flex items-center gap-3 flex-wrap">
             {/* Search */}
