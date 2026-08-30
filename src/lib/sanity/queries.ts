@@ -13,13 +13,24 @@ import { groq } from "next-sanity";
  * 2. `aspectRatio` no se almacena — se deriva de los metadatos del asset. Sale
  *    como número (0.75), no como el string "3/4" del placeholder; CSS acepta
  *    ambos en `aspect-ratio`.
- * 3. `presenceInMexico` es un booleano en ambos lados; `nativeToMexico` va
+ * 3. En la ficha, `author` es la AUTORIDAD TAXONÓMICA (string, "Sinéty, 1901")
+ *    y quien redactó la ficha va aparte en `curator`. Compartían clave y el
+ *    objeto pisaba al string, dejando la autoría taxonómica inalcanzable.
+ * 4. `presenceInMexico` es un booleano en ambos lados; `nativeToMexico` va
  *    aparte porque una especie puede estar presente sin ser nativa.
  *
  * Divergencia que SÍ requiere trabajo en el componente: `description` es
  * Portable Text (array de bloques) en Sanity y string plano en el placeholder.
  * Al conectar la ficha de especie hace falta un renderer de Portable Text.
  */
+
+/** Portable Text con los assets de las imágenes ya resueltos a URL. */
+const PROSE = (field: string) => /* groq */ `
+  "${field}": ${field}[]{
+    ...,
+    _type == "image" => { ..., "asset": asset->{ url } }
+  }
+`;
 
 /** Campos compartidos por las vistas de listado de especies. */
 const SPECIES_CARD_FIELDS = /* groq */ `
@@ -75,8 +86,8 @@ export const speciesDetailQuery = groq`
   *[_type == "species" && slug.current == $slug][0] {
     ${SPECIES_CARD_FIELDS},
     ${SPECIES_LOCATIONS},
-    description,
-    descriptionEn,
+    ${PROSE("description")},
+    ${PROSE("descriptionEn")},
     habitat,
     behavior,
     tribe,
@@ -108,7 +119,7 @@ export const speciesDetailQuery = groq`
     }, []),
     "references": coalesce(references, []),
     publishedAt,
-    author-> {
+    "curator": author-> {
       name,
       roleLabel,
       bio,
@@ -161,8 +172,8 @@ export const articlesIndexQuery = groq`
 export const articleDetailQuery = groq`
   *[_type == "article" && slug.current == $slug][0] {
     ${ARTICLE_CARD_FIELDS},
-    bodyEs,
-    bodyEn,
+    ${PROSE("bodyEs")},
+    ${PROSE("bodyEn")},
     author-> {
       name,
       roleLabel,
@@ -191,14 +202,20 @@ export const searchIndexQuery = groq`{
     family,
     catalogNum,
     psgNumber,
-    "tags": coalesce(tags, [])
+    "tags": coalesce(tags, []),
+    "image": mainImage.asset->url
   },
   "articles": *[_type == "article"] | order(publishedAt desc) {
     "slug": slug.current,
     titleEs,
     titleEn,
     category,
-    publishedAt
+    publishedAt,
+    readingMinutes,
+    excerpt,
+    excerptEn,
+    "tags": coalesce(tags, []),
+    "image": mainImage.asset->url
   }
 }`;
 

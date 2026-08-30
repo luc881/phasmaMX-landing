@@ -7,85 +7,11 @@ import { ArrowUpRight } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link } from "@/i18n/navigation";
+import type { SpeciesCard as Species } from "@/lib/content/species";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const PLACEHOLDER_SPECIES = [
-  {
-    id: "1",
-    scientificName: "Carausius morosus",
-    commonNameEs: "Insecto palo indio",
-    commonNameEn: "Indian Stick Insect",
-    family: "Diapheromeridae",
-    conservationStatus: "LC",
-    slug: "carausius-morosus",
-    image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80&fit=crop&crop=center",
-    catalogNum: "CAT-001",
-    origin: "India · Sri Lanka",
-  },
-  {
-    id: "2",
-    scientificName: "Bacillus rossius",
-    commonNameEs: "Insecto palo mediterráneo",
-    commonNameEn: "Mediterranean Stick Insect",
-    family: "Bacillidae",
-    conservationStatus: "LC",
-    slug: "bacillus-rossius",
-    image: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=80&fit=crop&crop=center",
-    catalogNum: "CAT-002",
-    origin: "Mediterranean Europe",
-  },
-  {
-    id: "3",
-    scientificName: "Eurycantha calcarata",
-    commonNameEs: "Insecto palo espinoso gigante",
-    commonNameEn: "Giant Spiny Stick Insect",
-    family: "Phasmatidae",
-    conservationStatus: "LC",
-    slug: "eurycantha-calcarata",
-    image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80&fit=crop&crop=center",
-    catalogNum: "CAT-003",
-    origin: "New Guinea",
-  },
-  {
-    id: "4",
-    scientificName: "Extatosoma tiaratum",
-    commonNameEs: "Insecto palo australiano",
-    commonNameEn: "Australian Stick Insect",
-    family: "Phasmatidae",
-    conservationStatus: "LC",
-    slug: "extatosoma-tiaratum",
-    image: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=800&q=80&fit=crop&crop=center",
-    catalogNum: "CAT-004",
-    origin: "Australia",
-  },
-  {
-    id: "5",
-    scientificName: "Heteropteryx dilatata",
-    commonNameEs: "Ninfa de la jungla malaya",
-    commonNameEn: "Malayan Jungle Nymph",
-    family: "Heteropterygidae",
-    conservationStatus: "LC",
-    slug: "heteropteryx-dilatata",
-    image: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=800&q=80&fit=crop&crop=center",
-    catalogNum: "CAT-005",
-    origin: "Malaysia · Borneo",
-  },
-  {
-    id: "6",
-    scientificName: "Phyllium giganteum",
-    commonNameEs: "Insecto hoja gigante de Malasia",
-    commonNameEn: "Giant Malaysian Leaf Insect",
-    family: "Phylliidae",
-    conservationStatus: "NE",
-    slug: "phyllium-giganteum",
-    image: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=800&q=80&fit=crop&crop=center",
-    catalogNum: "CAT-006",
-    origin: "Peninsular Malaysia",
-  },
-];
-
-export default function FeaturedSpecies() {
+export default function FeaturedSpecies({ species: allSpecies }: { species: Species[] }) {
   const t = useTranslations();
   const locale = useLocale();
   const sectionRef = useRef<HTMLElement>(null);
@@ -156,7 +82,7 @@ export default function FeaturedSpecies() {
           ref={gridRef}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border"
         >
-          {PLACEHOLDER_SPECIES.map((species, index) => (
+          {allSpecies.map((species, index) => (
             <SpecimenCard
               key={species.id}
               species={species}
@@ -184,12 +110,16 @@ function SpecimenCard({
   locale,
   viewLabel,
 }: {
-  species: (typeof PLACEHOLDER_SPECIES)[0];
+  species: Species;
   index: number;
   locale: string;
   viewLabel: string;
 }) {
-  const commonName = locale === "en" ? species.commonNameEn : species.commonNameEs;
+  // El inglés casi nunca está cargado todavía: cae al español antes que dejar hueco.
+  const commonName =
+    (locale === "en" ? species.commonNameEn : null) ??
+    species.commonNameEs ??
+    species.scientificName;
 
   return (
     <Link
@@ -198,14 +128,22 @@ function SpecimenCard({
     >
       {/* Full-bleed image */}
       <div className="specimen-image w-full">
-        <Image
-          src={species.image}
-          alt={`${species.scientificName} — ${commonName}`}
-          width={600}
-          height={900}
-          className="w-full h-full object-cover transition-transform duration-800 group-hover:scale-[1.04]"
-          style={{ transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)" }}
-        />
+        {species.image ? (
+          <Image
+            src={species.image}
+            alt={species.imageAlt ?? `${species.scientificName} — ${commonName}`}
+            width={600}
+            height={900}
+            className="w-full h-full object-cover transition-transform duration-800 group-hover:scale-[1.04]"
+            style={{ transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)" }}
+          />
+        ) : (
+          <div className="w-full h-full bg-surface flex items-center justify-center">
+            <span className="font-mono text-caption text-text3 uppercase tracking-widest">
+              Sin fotografía
+            </span>
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-void via-void/40 to-transparent" />
       </div>
 
@@ -229,7 +167,7 @@ function SpecimenCard({
         <div className="flex flex-wrap gap-x-4 gap-y-1 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-600 ease-[cubic-bezier(0.22,1,0.36,1)]">
           <span className="font-mono text-caption text-text3">{species.family}</span>
           <span className="font-mono text-caption text-text3">·</span>
-          <span className="font-mono text-caption text-text3">{species.origin}</span>
+          <span className="font-mono text-caption text-text3">{species.geographicOrigin}</span>
         </div>
 
         <div className="mt-4 flex items-center gap-2 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-600 delay-75 ease-[cubic-bezier(0.22,1,0.36,1)]">

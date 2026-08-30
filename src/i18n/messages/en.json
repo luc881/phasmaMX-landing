@@ -159,7 +159,20 @@
     "map_locations_plural": "{n} recorded locations",
     "map_collector": "Collected by",
     "map_date": "Record date",
-    "view_species": "View species"
+    "view_species": "View species",
+    "no_image": "No photograph",
+    "no_description": "Description not available yet.",
+    "breeding_facts": "Breeding facts",
+    "rearing_difficulty": "Rearing difficulty",
+    "rearing_easy": "Easy",
+    "rearing_moderate": "Moderate",
+    "rearing_hard": "Hard",
+    "rearing_unknown": "Unrated",
+    "parthenogenetic_label": "Parthenogenesis",
+    "parthenogenetic_yes": "Yes",
+    "parthenogenetic_no": "No",
+    "incubation_label": "Incubation",
+    "months_unit": "months"
   },
   "articles_page": {
     "label": "Phasma MX · Publications and outreach",

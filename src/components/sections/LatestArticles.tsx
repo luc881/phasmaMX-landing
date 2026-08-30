@@ -7,24 +7,21 @@ import { ArrowUpRight } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link } from "@/i18n/navigation";
-import {
-  PLACEHOLDER_ARTICLES,
-  CATEGORY_META,
-  localizeArticle,
-  type ArticleCategory,
-} from "@/lib/placeholder/articles";
+import { CATEGORY_META, formatDate, type ArticleCategory } from "@/lib/placeholder/articles";
+import type { ArticleCard } from "@/lib/content/articles";
 
 gsap.registerPlugin(ScrollTrigger);
 
-function formatDate(dateStr: string, locale = "es") {
-  return new Date(dateStr).toLocaleDateString(locale === "es" ? "es-MX" : "en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+// El inglés casi nunca está cargado todavía: cae al español antes que dejar hueco.
+function localizeArticle(article: ArticleCard, locale: string) {
+  return {
+    ...article,
+    title: (locale === "en" ? article.titleEn : null) ?? article.titleEs,
+    excerpt: (locale === "en" ? article.excerptEn : null) ?? article.excerpt,
+  };
 }
 
-export default function LatestArticles() {
+export default function LatestArticles({ articles: latestArticles }: { articles: ArticleCard[] }) {
   const t = useTranslations();
   const tArticles = useTranslations("articles_page");
   const locale = useLocale();
@@ -49,7 +46,9 @@ export default function LatestArticles() {
     return () => ctx.revert();
   }, []);
 
-  const articles = PLACEHOLDER_ARTICLES.slice(0, 4).map((a) => localizeArticle(a, locale));
+  // `latestArticles` ya viene limitado a 4 por la consulta GROQ.
+  const articles = latestArticles.map((a) => localizeArticle(a, locale));
+  if (articles.length === 0) return null;
   const [featured, ...rest] = articles;
 
   return (
@@ -82,14 +81,22 @@ export default function LatestArticles() {
             className="article-reveal lg:col-span-7 group relative overflow-hidden bg-void"
             style={{ aspectRatio: "4/3" }}
           >
-            <Image
-              src={featured.image}
-              alt={featured.title}
-              fill
-              className="object-cover transition-transform duration-800 group-hover:scale-[1.03]"
-              style={{ transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36,1)" }}
-              sizes="(max-width: 1024px) 100vw, 60vw"
-            />
+            {featured.image ? (
+              <Image
+                src={featured.image}
+                alt={featured.title}
+                fill
+                className="object-cover transition-transform duration-800 group-hover:scale-[1.03]"
+                style={{ transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36,1)" }}
+                sizes="(max-width: 1024px) 100vw, 60vw"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-surface flex items-center justify-center">
+                <span className="font-mono text-caption text-text3 uppercase tracking-widest">
+                  Sin fotografía
+                </span>
+              </div>
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-void via-void/40 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-8">
               <p
@@ -106,10 +113,14 @@ export default function LatestArticles() {
                 {featured.excerpt}
               </p>
               <div className="flex items-center gap-4">
-                <span className="font-mono text-caption text-text3">
-                  {featured.author.name}
-                </span>
-                <span className="font-mono text-caption text-text3">·</span>
+                {featured.author && (
+                  <>
+                    <span className="font-mono text-caption text-text3">
+                      {featured.author.name}
+                    </span>
+                    <span className="font-mono text-caption text-text3">·</span>
+                  </>
+                )}
                 <span className="font-mono text-caption text-text3">
                   {formatDate(featured.publishedAt, locale)}
                 </span>
@@ -127,13 +138,15 @@ export default function LatestArticles() {
                   href={`/articulos/${article.slug}`}
                   className="article-reveal group flex gap-5 p-6 border-b border-border last:border-b-0 hover:bg-surface transition-colors duration-400"
                 >
-                  <div className="relative shrink-0 overflow-hidden" style={{ width: 80, height: 80 }}>
-                    <Image
-                      src={article.image}
-                      alt={article.title}
-                      fill
-                      className="object-cover transition-transform duration-600 group-hover:scale-105"
-                    />
+                  <div className="relative shrink-0 overflow-hidden bg-surface" style={{ width: 80, height: 80 }}>
+                    {article.image && (
+                      <Image
+                        src={article.image}
+                        alt={article.title}
+                        fill
+                        className="object-cover transition-transform duration-600 group-hover:scale-105"
+                      />
+                    )}
                   </div>
                   <div className="flex flex-col justify-between min-w-0">
                     <div>

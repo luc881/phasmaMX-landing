@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import CatalogGrid from "@/components/catalog/CatalogGrid";
+import { getSpeciesCatalog } from "@/lib/content/species";
 
 export function generateStaticParams() {
   return [{ locale: "es" }, { locale: "en" }];
@@ -24,6 +25,14 @@ export default async function EspeciesPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "catalog" });
+
+  // Primera página que lee de Sanity en lugar de src/lib/placeholder/.
+  const species = await getSpeciesCatalog();
+
+  // Cifras del encabezado calculadas sobre lo publicado: antes eran literales
+  // ("240+", "120+", "6") que no correspondían al catálogo real.
+  const nativeCount = species.filter((s) => s.presenceInMexico).length;
+  const familyCount = new Set(species.map((s) => s.family).filter(Boolean)).size;
 
   return (
     <div className="min-h-screen">
@@ -49,9 +58,9 @@ export default async function EspeciesPage({
             {/* Stats */}
             <div className="flex gap-8 shrink-0">
               {[
-                ["240+", t("stat_species")],
-                ["120+", t("stat_native")],
-                ["6", t("stat_families")],
+                [String(species.length), t("stat_species")],
+                [String(nativeCount), t("stat_native")],
+                [String(familyCount), t("stat_families")],
               ].map(([val, label]) => (
                 <div key={label} className="text-center">
                   <p className="font-display text-display-md font-light text-gold">{val}</p>
@@ -64,7 +73,7 @@ export default async function EspeciesPage({
       </header>
 
       {/* ── Catalog grid with filters ── */}
-      <CatalogGrid />
+      <CatalogGrid species={species} />
 
       {/* ── Bottom CTA ── */}
       <section className="border-t border-border">

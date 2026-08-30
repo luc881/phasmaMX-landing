@@ -6,6 +6,7 @@ import { routing } from "@/i18n/routing";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import GlobalSearch from "@/components/search/GlobalSearch";
+import { getSearchIndex } from "@/lib/content/articles";
 import "../globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -50,6 +51,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(locale);
 
   const messages = await getMessages();
+  const searchIndex = await getSearchIndex();
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -58,7 +60,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       >
         <NextIntlClientProvider messages={messages}>
           <Header locale={locale} />
-          <GlobalSearch />
+          <GlobalSearch searchIndex={searchIndex} />
           <main>{children}</main>
           <Footer />
         </NextIntlClientProvider>

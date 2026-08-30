@@ -6,84 +6,85 @@ import { Search, X, ArrowUpRight, Bug, FileText } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import gsap from "gsap";
-import { PLACEHOLDER_SPECIES } from "@/lib/placeholder/species";
-import {
-  PLACEHOLDER_ARTICLES,
-  CATEGORY_META,
-  localizeArticle,
-  type ArticleCategory,
-} from "@/lib/placeholder/articles";
+import { CATEGORY_META } from "@/lib/placeholder/articles";
+import type { SearchIndex } from "@/lib/content/articles";
 
 // ── Result types ──────────────────────────────────────────────────────────────
 
 type SpeciesResult = {
   type: "species";
-  id: string;
   slug: string;
   scientificName: string;
   commonName: string;
   family: string;
-  image: string;
-  catalogNum: string;
+  catalogNum: string | null;
+  image: string | null;
 };
 
 type ArticleResult = {
   type: "article";
-  id: string;
   slug: string;
   title: string;
+  image: string | null;
+  readingMinutes: number | null;
   categoryColor: string;
   categoryKey: string;
-  readingMinutes: number;
-  image: string;
 };
 
 type SearchResult = SpeciesResult | ArticleResult;
 
 // ── Search logic ──────────────────────────────────────────────────────────────
 
-function runSearch(query: string, locale: string): { species: SpeciesResult[]; articles: ArticleResult[] } {
+function runSearch(
+  query: string,
+  locale: string,
+  index: SearchIndex
+): { species: SpeciesResult[]; articles: ArticleResult[] } {
   if (!query.trim()) return { species: [], articles: [] };
   const q = query.toLowerCase();
 
-  const species: SpeciesResult[] = PLACEHOLDER_SPECIES.filter((s) =>
-    s.scientificName.toLowerCase().includes(q) ||
-    s.commonNameEs.toLowerCase().includes(q) ||
-    (s.commonNameEn?.toLowerCase().includes(q) ?? false) ||
-    s.family.toLowerCase().includes(q) ||
-    s.tags.some((t) => t.toLowerCase().includes(q))
-  )
+  const species: SpeciesResult[] = index.species
+    .filter((s) =>
+      s.scientificName.toLowerCase().includes(q) ||
+      (s.commonNameEs?.toLowerCase().includes(q) ?? false) ||
+      (s.commonNameEn?.toLowerCase().includes(q) ?? false) ||
+      s.family.toLowerCase().includes(q) ||
+      (s.psgNumber?.toLowerCase().includes(q) ?? false) ||
+      s.tags.some((t) => t.toLowerCase().includes(q))
+    )
     .slice(0, 5)
     .map((s) => ({
       type: "species",
-      id: s.id,
       slug: s.slug,
       scientificName: s.scientificName,
-      commonName: locale === "en" && s.commonNameEn ? s.commonNameEn : s.commonNameEs,
+      commonName: (locale === "en" ? s.commonNameEn : s.commonNameEs) ?? s.commonNameEs ?? s.scientificName,
       family: s.family,
-      image: s.image,
       catalogNum: s.catalogNum,
+      image: s.image,
     }));
 
-  const articles: ArticleResult[] = PLACEHOLDER_ARTICLES.filter((a) =>
-    a.titleEs.toLowerCase().includes(q) ||
-    a.titleEn.toLowerCase().includes(q) ||
-    a.excerpt.toLowerCase().includes(q) ||
-    a.excerptEn.toLowerCase().includes(q) ||
-    a.tags.some((t) => t.toLowerCase().includes(q))
-  )
+  const articles: ArticleResult[] = index.articles
+    .filter((a) =>
+      // Buscar solo por título dejaba fuera cualquier artículo cuyo tema no
+      // esté literalmente en el titular: el excerpt y las etiquetas son
+      // justamente donde vive el vocabulario por el que la gente busca.
+      a.titleEs.toLowerCase().includes(q) ||
+      (a.titleEn?.toLowerCase().includes(q) ?? false) ||
+      (a.excerpt?.toLowerCase().includes(q) ?? false) ||
+      (a.excerptEn?.toLowerCase().includes(q) ?? false) ||
+      a.tags.some((t) => t.toLowerCase().includes(q))
+    )
     .slice(0, 5)
     .map((a) => {
-      const meta = CATEGORY_META[a.category as ArticleCategory];
+      const meta = CATEGORY_META[a.category];
       return {
         type: "article",
-        id: a.id,
         slug: a.slug,
-        title: localizeArticle(a, locale).title,
+        title: (locale === "en" ? a.titleEn : a.titleEs) ?? a.titleEs,
+        image: a.image,
+        readingMinutes: a.readingMinutes,
         categoryColor: meta.color,
         categoryKey: meta.translationKey,
-        readingMinutes: a.readingMinutes,
-        image: a.image,
       };
     });
 
@@ -92,7 +93,7 @@ function runSearch(query: string, locale: string): { species: SpeciesResult[]; a
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function GlobalSearch() {
+export default function GlobalSearch({ searchIndex }: { searchIndex: SearchIndex }) {
   const t = useTranslations("search");
   const tArticles = useTranslations("articles_page");
   const locale = useLocale();
@@ -148,9 +149,9 @@ export default function GlobalSearch() {
 
   // Live search
   useEffect(() => {
-    setResults(runSearch(query, locale));
+    setResults(runSearch(query, locale, searchIndex));
     setActiveIndex(-1);
-  }, [query, locale]);
+  }, [query, locale, searchIndex]);
 
   // Animate results list when results change
   useEffect(() => {
@@ -265,20 +266,26 @@ export default function GlobalSearch() {
                   />
                   {results.species.map((s, i) => (
                     <ResultItem
-                      key={s.id}
+                      key={s.slug}
                       active={activeIndex === i}
                       onClick={() => setOpen(false)}
                       href={`/especies/${s.slug}`}
                     >
-                      <div className="relative w-12 h-12 shrink-0 overflow-hidden">
-                        <Image src={s.image} alt={s.scientificName} fill className="object-cover" sizes="48px" />
+                      <div className="relative w-12 h-12 shrink-0 overflow-hidden border border-border bg-surface">
+                        {s.image ? (
+                          <Image src={s.image} alt="" fill className="object-cover" sizes="48px" />
+                        ) : (
+                          <span className="absolute inset-0 flex items-center justify-center text-text3">
+                            <Bug size={16} />
+                          </span>
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-mono text-caption text-gold italic truncate">{s.scientificName}</p>
                         <p className="font-sans text-body-md text-text1 truncate leading-snug">{s.commonName}</p>
                         <p className="font-mono text-caption text-text3 truncate">{s.family}</p>
                       </div>
-                      <span className="catalog-number shrink-0 self-start">{s.catalogNum}</span>
+                      {s.catalogNum && <span className="catalog-number shrink-0 self-start">{s.catalogNum}</span>}
                     </ResultItem>
                   ))}
                 </section>
@@ -296,20 +303,25 @@ export default function GlobalSearch() {
                     const globalIdx = results.species.length + i;
                     return (
                       <ResultItem
-                        key={a.id}
+                        key={a.slug}
                         active={activeIndex === globalIdx}
                         onClick={() => setOpen(false)}
                         href={`/articulos/${a.slug}`}
                       >
-                        <div className="relative w-12 h-12 shrink-0 overflow-hidden">
-                          <Image src={a.image} alt={a.title} fill className="object-cover" sizes="48px" />
+                        <div className="relative w-12 h-12 shrink-0 overflow-hidden border border-border bg-surface">
+                          {a.image ? (
+                            <Image src={a.image} alt="" fill className="object-cover" sizes="48px" />
+                          ) : (
+                            <span className="absolute inset-0 flex items-center justify-center text-text3">
+                              <FileText size={16} />
+                            </span>
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className={`font-mono text-caption uppercase tracking-widest mb-0.5 ${a.categoryColor}`}>
                             {tArticles(a.categoryKey as Parameters<typeof tArticles>[0])}
                           </p>
                           <p className="font-sans text-body-md text-text1 line-clamp-1 leading-snug">{a.title}</p>
-                          <p className="font-mono text-caption text-text3">{a.readingMinutes} min</p>
                         </div>
                       </ResultItem>
                     );

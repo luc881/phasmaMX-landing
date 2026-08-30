@@ -159,7 +159,20 @@
     "map_locations_plural": "{n} localidades registradas",
     "map_collector": "Colectado por",
     "map_date": "Fecha de registro",
-    "view_species": "Ver especie"
+    "view_species": "Ver especie",
+    "no_image": "Sin fotografía",
+    "no_description": "Descripción no disponible aún.",
+    "breeding_facts": "Datos de cría",
+    "rearing_difficulty": "Dificultad de cría",
+    "rearing_easy": "Fácil",
+    "rearing_moderate": "Moderada",
+    "rearing_hard": "Difícil",
+    "rearing_unknown": "Sin evaluar",
+    "parthenogenetic_label": "Partenogénesis",
+    "parthenogenetic_yes": "Sí",
+    "parthenogenetic_no": "No",
+    "incubation_label": "Incubación",
+    "months_unit": "meses"
   },
   "articles_page": {
     "label": "Phasma MX · Publicaciones y divulgación",

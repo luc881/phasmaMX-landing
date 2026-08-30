@@ -3,19 +3,25 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
 import { ArrowLeft, Clock, Calendar, Tag, ArrowUpRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { CATEGORY_META, formatDate } from "@/lib/placeholder/articles";
+import ProseBlocks from "@/components/ui/ProseBlocks";
 import {
-  PLACEHOLDER_ARTICLES,
-  CATEGORY_META,
-  formatDate,
-  localizeArticle,
-  type ArticlePlaceholder,
-  type ArticleCategory,
-} from "@/lib/placeholder/articles";
+  getArticleBySlug,
+  getArticleSlugs,
+  getArticlesIndex,
+  type ArticleCard,
+} from "@/lib/content/articles";
 
-export function generateStaticParams() {
-  return ["es", "en"].flatMap((locale) =>
-    PLACEHOLDER_ARTICLES.map((a) => ({ locale, slug: a.slug }))
-  );
+export async function generateStaticParams() {
+  const slugs = await getArticleSlugs();
+  return ["es", "en"].flatMap((locale) => slugs.map((slug) => ({ locale, slug })));
+}
+
+/** Título/extracto según locale; cae a ES si el campo EN viene vacío. */
+function localize(article: ArticleCard, locale: string) {
+  const title = locale === "en" && article.titleEn ? article.titleEn : article.titleEs;
+  const excerpt = (locale === "en" && article.excerptEn ? article.excerptEn : article.excerpt) ?? "";
+  return { ...article, title, excerpt };
 }
 
 export async function generateMetadata({
@@ -24,9 +30,9 @@ export async function generateMetadata({
   params: Promise<{ slug: string; locale: string }>;
 }) {
   const { slug, locale } = await params;
-  const article = PLACEHOLDER_ARTICLES.find((a) => a.slug === slug);
+  const article = await getArticleBySlug(slug);
   if (!article) return { title: "Artículo no encontrado — Phasma MX" };
-  const localized = localizeArticle(article, locale);
+  const localized = localize(article, locale);
   return {
     title: `${localized.title} — Phasma MX`,
     description: localized.excerpt.slice(0, 155),
@@ -41,31 +47,42 @@ export default async function ArticleDetailPage({
   const { slug, locale } = await params;
   setRequestLocale(locale);
 
-  const articleRaw = PLACEHOLDER_ARTICLES.find((a) => a.slug === slug);
+  const articleRaw = await getArticleBySlug(slug);
   if (!articleRaw) notFound();
 
   const t = await getTranslations({ locale, namespace: "article_detail" });
   const tArticles = await getTranslations({ locale, namespace: "articles_page" });
 
-  const article = localizeArticle(articleRaw, locale);
-  const meta = CATEGORY_META[article.category as ArticleCategory];
-  const related = PLACEHOLDER_ARTICLES.filter(
-    (a) => articleRaw.relatedSlugs.includes(a.slug)
-  ).map((a) => localizeArticle(a, locale));
+  const article = localize(articleRaw, locale);
+  // Portable Text del cuerpo: bodyEn casi siempre viene vacío (contenido
+  // cargado desde el placeholder en español), así que cae a bodyEs.
+  const body = locale === "en" && articleRaw.bodyEn?.length ? articleRaw.bodyEn : articleRaw.bodyEs;
+  const meta = CATEGORY_META[article.category];
+
+  // relatedSlugs solo trae slugs; el índice completo da título/imagen/autor
+  // para pintar las tarjetas relacionadas sin otra consulta dedicada.
+  const relatedSlugs = articleRaw.relatedSlugs ?? [];
+  const allArticles = relatedSlugs.length ? await getArticlesIndex() : [];
+  const related = relatedSlugs
+    .map((s) => allArticles.find((a) => a.slug === s))
+    .filter((a): a is ArticleCard => Boolean(a))
+    .map((a) => localize(a, locale));
 
   return (
     <div className="min-h-screen">
       {/* ── Hero ── */}
-      <section className="relative h-[70vh] min-h-[500px] flex items-end overflow-hidden">
-        <Image
-          src={article.image}
-          alt={article.title}
-          fill
-          priority
-          quality={90}
-          className="object-cover"
-          sizes="100vw"
-        />
+      <section className="relative h-[70vh] min-h-[500px] flex items-end overflow-hidden bg-surface">
+        {article.image && (
+          <Image
+            src={article.image}
+            alt={article.title}
+            fill
+            priority
+            quality={90}
+            className="object-cover"
+            sizes="100vw"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-void via-void/60 to-void/10" />
         <div className="absolute inset-0 bg-gradient-to-r from-void/50 via-transparent to-transparent" />
 
@@ -87,7 +104,7 @@ export default async function ArticleDetailPage({
               </span>
               <span className="font-mono text-caption text-text3 flex items-center gap-1.5">
                 <Clock size={11} />
-                {article.readingMinutes} {t("read_time")}
+                {article.readingMinutes ?? "—"} {t("read_time")}
               </span>
             </div>
             <h1 className="font-display text-display-md font-light text-text1 leading-tight text-balance">
@@ -97,11 +114,13 @@ export default async function ArticleDetailPage({
         </div>
 
         {/* Image caption */}
-        <div className="absolute bottom-3 right-6 lg:right-16 z-10">
-          <p className="font-mono text-caption text-text3 opacity-60 italic text-right max-w-xs">
-            {article.imageCaption}
-          </p>
-        </div>
+        {article.imageCaption && (
+          <div className="absolute bottom-3 right-6 lg:right-16 z-10">
+            <p className="font-mono text-caption text-text3 opacity-60 italic text-right max-w-xs">
+              {article.imageCaption}
+            </p>
+          </div>
+        )}
       </section>
 
       {/* ── Main content ── */}
@@ -115,56 +134,8 @@ export default async function ArticleDetailPage({
               {article.excerpt}
             </p>
 
-            {/* Body sections */}
-            <div className="space-y-8">
-              {article.body.map((section, i) => {
-                if (section.type === "paragraph") {
-                  return (
-                    <p key={i} className="font-sans text-body-lg text-text2 leading-relaxed">
-                      {section.content}
-                    </p>
-                  );
-                }
-                if (section.type === "subheading") {
-                  return (
-                    <h2 key={i} className="font-display text-display-sm font-light text-text1 pt-6 pb-2 border-b border-border">
-                      {section.content}
-                    </h2>
-                  );
-                }
-                if (section.type === "pull-quote") {
-                  return (
-                    <blockquote key={i} className="font-display text-display-sm font-light italic text-text1 border-l-2 border-gold pl-8 py-2 my-10">
-                      {section.content}
-                    </blockquote>
-                  );
-                }
-                if (section.type === "image" && section.src) {
-                  return (
-                    <figure key={i} className="my-10 -mx-0">
-                      <div className="relative w-full overflow-hidden" style={{ aspectRatio: "16/9" }}>
-                        <Image
-                          src={section.src}
-                          alt={section.caption ?? ""}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 1024px) 100vw, 65vw"
-                        />
-                      </div>
-                      {(section.caption || section.credit) && (
-                        <figcaption className="flex items-start justify-between gap-4 mt-3 px-1">
-                          <p className="font-mono text-caption text-text3 italic">{section.caption}</p>
-                          {section.credit && (
-                            <p className="font-mono text-caption text-text3 shrink-0">{section.credit}</p>
-                          )}
-                        </figcaption>
-                      )}
-                    </figure>
-                  );
-                }
-                return null;
-              })}
-            </div>
+            {/* Body — Portable Text */}
+            <ProseBlocks value={body} />
 
             {/* Tags */}
             <div className="mt-14 pt-8 border-t border-border">
@@ -194,11 +165,11 @@ export default async function ArticleDetailPage({
                 <div className="p-6">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 bg-gold flex items-center justify-center shrink-0">
-                      <span className="font-mono text-void font-bold">{article.author.initials}</span>
+                      <span className="font-mono text-void font-bold">{article.author?.initials ?? "PM"}</span>
                     </div>
                     <div>
-                      <p className="font-sans text-body-lg text-text1 font-medium leading-snug">{article.author.name}</p>
-                      <p className="font-mono text-caption text-text3 mt-0.5">{article.author.role}</p>
+                      <p className="font-sans text-body-lg text-text1 font-medium leading-snug">{article.author?.name ?? "Phasma MX"}</p>
+                      <p className="font-mono text-caption text-text3 mt-0.5">{article.author?.roleLabel}</p>
                     </div>
                   </div>
                 </div>
@@ -224,7 +195,7 @@ export default async function ArticleDetailPage({
                     <Clock size={11} />
                     {t("reading_label")}
                   </span>
-                  <span className="font-sans text-body-md text-text2">{article.readingMinutes} {t("minutes")}</span>
+                  <span className="font-sans text-body-md text-text2">{article.readingMinutes ?? "—"} {t("minutes")}</span>
                 </div>
               </div>
 
@@ -238,20 +209,22 @@ export default async function ArticleDetailPage({
                   </div>
                   <div className="divide-y divide-border">
                     {related.map((rel) => {
-                      const relMeta = CATEGORY_META[rel.category as ArticleCategory];
+                      const relMeta = CATEGORY_META[rel.category];
                       return (
                         <Link
                           key={rel.id}
                           href={`/articulos/${rel.slug}`}
                           className="flex gap-4 p-4 hover:bg-void transition-colors duration-300 group"
                         >
-                          <div className="relative w-16 h-16 shrink-0 overflow-hidden">
-                            <Image
-                              src={rel.image}
-                              alt={rel.title}
-                              fill
-                              className="object-cover group-hover:scale-105 transition-transform duration-400"
-                            />
+                          <div className="relative w-16 h-16 shrink-0 overflow-hidden bg-surface">
+                            {rel.image && (
+                              <Image
+                                src={rel.image}
+                                alt={rel.title}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-400"
+                              />
+                            )}
                           </div>
                           <div className="flex flex-col justify-between min-w-0">
                             <div>
@@ -264,7 +237,7 @@ export default async function ArticleDetailPage({
                             </div>
                             <p className="font-mono text-caption text-text3 flex items-center gap-1 mt-1">
                               <Clock size={9} />
-                              {rel.readingMinutes} min
+                              {rel.readingMinutes ?? "—"} min
                             </p>
                           </div>
                         </Link>
@@ -313,20 +286,22 @@ export default async function ArticleDetailPage({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border">
               {related.map((rel) => {
-                const relMeta = CATEGORY_META[rel.category as ArticleCategory];
+                const relMeta = CATEGORY_META[rel.category];
                 return (
                   <Link
                     key={rel.id}
                     href={`/articulos/${rel.slug}`}
                     className="group flex gap-6 bg-void p-6 hover:bg-surface transition-colors duration-400"
                   >
-                    <div className="relative w-24 h-24 shrink-0 overflow-hidden">
-                      <Image
-                        src={rel.image}
-                        alt={rel.title}
-                        fill
-                        className="object-cover transition-transform duration-600 group-hover:scale-105"
-                      />
+                    <div className="relative w-24 h-24 shrink-0 overflow-hidden bg-surface">
+                      {rel.image && (
+                        <Image
+                          src={rel.image}
+                          alt={rel.title}
+                          fill
+                          className="object-cover transition-transform duration-600 group-hover:scale-105"
+                        />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className={`font-mono text-caption uppercase tracking-widest mb-2 ${relMeta.color}`}>
@@ -337,7 +312,7 @@ export default async function ArticleDetailPage({
                       </h3>
                       <p className="font-mono text-caption text-text3 mt-3 flex items-center gap-1.5">
                         <Clock size={10} />
-                        {rel.readingMinutes} min · {rel.author.name.split(" ").slice(-1)[0]}
+                        {rel.readingMinutes ?? "—"} min · {(rel.author?.name ?? "Phasma MX").split(" ").slice(-1)[0]}
                       </p>
                     </div>
                   </Link>

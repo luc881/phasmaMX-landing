@@ -1,4 +1,4 @@
-import { PLACEHOLDER_SPECIES } from "@/lib/placeholder/species";
+import type { SpeciesCard } from "@/lib/content/species";
 
 /**
  * Banda de cajón de colección: los binomios del archivo desfilando con su
@@ -8,9 +8,14 @@ import { PLACEHOLDER_SPECIES } from "@/lib/placeholder/species";
  * Abre el pliego claro: aquí el sitio cambia de tinta sobre negro a tinta
  * sobre papel. `data-surface` lo lee el header para invertir su color.
  */
-export default function TaxonMarquee() {
-  const specimens = PLACEHOLDER_SPECIES.map((s) => ({
-    num: s.catalogNum,
+export default function TaxonMarquee({
+  species,
+}: {
+  species: Pick<SpeciesCard, "scientificName" | "catalogNum">[];
+}) {
+  const specimens = species.map((s) => ({
+    // Un puñado de fichas aún no tiene número de catálogo asignado.
+    num: s.catalogNum ?? "—",
     name: s.scientificName,
   }));
 
@@ -23,9 +28,9 @@ export default function TaxonMarquee() {
       <div className="flex w-max animate-marquee motion-reduce:animate-none group-hover:[animation-play-state:paused]">
         {[0, 1].map((copy) => (
           <div key={copy} className="flex shrink-0 items-baseline">
-            {specimens.map((s) => (
+            {specimens.map((s, i) => (
               <span
-                key={`${copy}-${s.num}`}
+                key={`${copy}-${i}-${s.name}`}
                 className="flex items-baseline gap-4 px-8 lg:px-10"
               >
                 <span className="catalog-number shrink-0 text-ink-3">{s.num}</span>

@@ -3,24 +3,51 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
 import { ArrowLeft, MapPin, BookOpen, Leaf, Bug, FlaskConical, Thermometer } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { PLACEHOLDER_SPECIES, STATUS_META, type ConservationStatus } from "@/lib/placeholder/species";
+import { STATUS_META, type ConservationStatus } from "@/lib/placeholder/species";
+import {
+  getSpeciesBySlug,
+  getRelatedSpecies,
+  getSpeciesSlugs,
+  type SpeciesDetail,
+} from "@/lib/content/species";
+import type { PortableTextBlock } from "@portabletext/types";
+import ProseBlocks from "@/components/ui/ProseBlocks";
 import SpeciesGallery from "@/components/species/SpeciesGallery";
 import SpeciesMap from "@/components/species/SpeciesMap";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const slugs = await getSpeciesSlugs();
   const locales = ["es", "en"];
-  const slugs = PLACEHOLDER_SPECIES.map((s) => s.slug);
   return locales.flatMap((locale) => slugs.map((slug) => ({ locale, slug })));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string; locale: string }> }) {
+/** Aplana Portable Text a texto plano, solo para metadatos (<meta description>). */
+function plainText(blocks: PortableTextBlock[] | null | undefined): string {
+  if (!blocks?.length) return "";
+  return blocks
+    .map((block) =>
+      Array.isArray(block.children)
+        ? block.children.map((c) => ("text" in c ? c.text ?? "" : "")).join("")
+        : ""
+    )
+    .join(" ");
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string; locale: string }>;
+}) {
   const { slug, locale } = await params;
-  const species = PLACEHOLDER_SPECIES.find((s) => s.slug === slug);
+  const species = await getSpeciesBySlug(slug);
   if (!species) return { title: "Especie no encontrada — Phasma MX" };
-  const commonName = locale === "en" && species.commonNameEn ? species.commonNameEn : species.commonNameEs;
+  const commonName =
+    (locale === "en" ? species.commonNameEn : species.commonNameEs) ?? species.commonNameEs ?? species.scientificName;
+  const description =
+    locale === "en" && species.descriptionEn?.length ? species.descriptionEn : species.description;
   return {
     title: `${species.scientificName} — Phasma MX`,
-    description: `${commonName}. ${species.description.slice(0, 120)}`,
+    description: `${commonName}. ${plainText(description).slice(0, 120)}`,
   };
 }
 
@@ -32,30 +59,64 @@ export default async function SpeciesDetailPage({
   const { slug, locale } = await params;
   setRequestLocale(locale);
 
-  const species = PLACEHOLDER_SPECIES.find((s) => s.slug === slug);
+  const species = await getSpeciesBySlug(slug);
   if (!species) notFound();
 
   const t = await getTranslations({ locale, namespace: "species_detail" });
-  const statusMeta = STATUS_META[species.conservationStatus as ConservationStatus];
-  const commonName = locale === "en" && species.commonNameEn ? species.commonNameEn : species.commonNameEs;
+  const statusMeta = STATUS_META[species.conservationStatus as ConservationStatus] ?? STATUS_META.NE;
+  const commonName =
+    (locale === "en" ? species.commonNameEn : species.commonNameEs) ?? species.commonNameEs ?? species.scientificName;
 
-  const relatedSpecies = PLACEHOLDER_SPECIES.filter(
-    (s) => s.family === species.family && s.id !== species.id
-  ).slice(0, 3);
+  const relatedSpecies = await getRelatedSpecies(species.family, slug);
+
+  const isEn = locale === "en";
+  const description = isEn && species.descriptionEn?.length ? species.descriptionEn : species.description;
+  const foodPlants = isEn && species.foodPlantsEn.length > 0 ? species.foodPlantsEn : species.foodPlants;
+  const females = (isEn && species.femalesEn) || species.females;
+  const males = (isEn && species.malesEn) || species.males;
+  const nymphs = (isEn && species.nymphsEn) || species.nymphs;
+  const eggs = (isEn && species.eggsEn) || species.eggs;
+  const breeding = (isEn && species.breedingEn) || species.breeding;
+
+  const gallery = species.gallery.map((img) => ({
+    src: img.src,
+    caption: img.caption ?? img.alt ?? "",
+    credit: img.credit ?? "",
+  }));
+
+  const rearingLabel: Record<NonNullable<SpeciesDetail["rearingDifficulty"]>, string> = {
+    easy: t("rearing_easy"),
+    moderate: t("rearing_moderate"),
+    hard: t("rearing_hard"),
+    unknown: t("rearing_unknown"),
+  };
+
+  const incubationRange =
+    species.incubationMonthsMin || species.incubationMonthsMax
+      ? [species.incubationMonthsMin, species.incubationMonthsMax].filter(Boolean).join("–")
+      : null;
 
   return (
     <div className="min-h-screen">
       {/* ── Hero ── */}
       <section className="relative h-[80vh] min-h-[560px] flex items-end overflow-hidden">
-        <Image
-          src={species.image}
-          alt={`${species.scientificName} — ${commonName}`}
-          fill
-          priority
-          quality={90}
-          className="object-cover"
-          sizes="100vw"
-        />
+        {species.image ? (
+          <Image
+            src={species.image}
+            alt={species.imageAlt ?? `${species.scientificName} — ${commonName}`}
+            fill
+            priority
+            quality={90}
+            className="object-cover"
+            sizes="100vw"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-surface flex items-center justify-center">
+            <span className="font-mono text-caption text-text3 uppercase tracking-widest">
+              {t("no_image")}
+            </span>
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-void via-void/50 to-void/10" />
         <div className="absolute inset-0 bg-gradient-to-r from-void/60 via-transparent to-transparent" />
 
@@ -68,9 +129,14 @@ export default async function SpeciesDetailPage({
           {t("back")}
         </Link>
 
-        {/* Catalog number */}
-        <div className="absolute top-24 right-6 lg:right-16 z-10">
-          <p className="font-mono text-caption text-text3 tracking-widest">{species.catalogNum}</p>
+        {/* Catalog number / PSG number */}
+        <div className="absolute top-24 right-6 lg:right-16 z-10 text-right space-y-1">
+          {species.catalogNum && (
+            <p className="font-mono text-caption text-text3 tracking-widest">{species.catalogNum}</p>
+          )}
+          {species.psgNumber && (
+            <p className="font-mono text-caption text-gold tracking-widest">PSG {species.psgNumber}</p>
+          )}
         </div>
 
         {/* Hero content */}
@@ -86,7 +152,7 @@ export default async function SpeciesDetailPage({
               {commonName}
             </p>
             <p className="font-mono text-caption text-text3">
-              {species.author}
+              {[species.author, species.year].filter(Boolean).join(", ")}
             </p>
           </div>
         </div>
@@ -101,30 +167,50 @@ export default async function SpeciesDetailPage({
 
             {/* Description */}
             <Section icon={<Bug size={16} />} label={t("description")}>
-              <p className="font-sans text-body-lg text-text2 leading-relaxed">
-                {species.description}
-              </p>
+              {description?.length ? (
+                <ProseBlocks value={description} />
+              ) : (
+                <p className="font-sans text-body-lg text-text3 italic">{t("no_description")}</p>
+              )}
             </Section>
 
             {/* Morphology */}
             <Section icon={<FlaskConical size={16} />} label={t("morphology")}>
               <div className="space-y-8">
-                <MorphCard title={t("females")} content={species.females} />
-                <MorphCard title={t("males")} content={species.males} />
-                <MorphCard title={t("nymphs")} content={species.nymphs} />
-                <MorphCard title={t("eggs")} content={species.eggs} />
+                {females && (
+                  <MorphCard
+                    title={t("females")}
+                    lengthMm={species.bodyLengthFemaleMm}
+                    content={females}
+                  />
+                )}
+                {males && (
+                  <MorphCard
+                    title={t("males")}
+                    lengthMm={species.bodyLengthMaleMm}
+                    content={males}
+                  />
+                )}
+                {nymphs && <MorphCard title={t("nymphs")} content={nymphs} />}
+                {eggs && <MorphCard title={t("eggs")} content={eggs} />}
               </div>
             </Section>
 
             {/* Habitat */}
-            <Section icon={<Leaf size={16} />} label={t("habitat")}>
-              <p className="font-sans text-body-lg text-text2 leading-relaxed mb-6">
-                {species.habitat}
-              </p>
-              <p className="font-sans text-body-md text-text2 leading-relaxed">
-                {species.behavior}
-              </p>
-            </Section>
+            {(species.habitat || species.behavior) && (
+              <Section icon={<Leaf size={16} />} label={t("habitat")}>
+                {species.habitat && (
+                  <p className="font-sans text-body-lg text-text2 leading-relaxed mb-6">
+                    {species.habitat}
+                  </p>
+                )}
+                {species.behavior && (
+                  <p className="font-sans text-body-md text-text2 leading-relaxed">
+                    {species.behavior}
+                  </p>
+                )}
+              </Section>
+            )}
 
             {/* Distribution Map */}
             {species.mexicoLocations && species.mexicoLocations.length > 0 && (
@@ -138,54 +224,79 @@ export default async function SpeciesDetailPage({
             )}
 
             {/* Food plants */}
-            <Section icon={<Leaf size={16} />} label={t("food_plants")}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {species.foodPlants.map((plant, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-3 p-4 border border-border bg-surface"
-                  >
-                    <span className="font-mono text-caption text-gold mt-0.5">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className="font-sans text-body-md text-text2">{plant}</span>
-                  </div>
-                ))}
-              </div>
-              <p className="font-mono text-caption text-text3 mt-3">
-                {t("food_plants_note")}
-              </p>
-            </Section>
+            {foodPlants.length > 0 && (
+              <Section icon={<Leaf size={16} />} label={t("food_plants")}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {foodPlants.map((plant, i) => (
+                    <div
+                      key={i}
+                      className="flex items-start gap-3 p-4 border border-border bg-surface"
+                    >
+                      <span className="font-mono text-caption text-gold mt-0.5">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className="font-sans text-body-md text-text2">{plant}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="font-mono text-caption text-text3 mt-3">
+                  {t("food_plants_note")}
+                </p>
+              </Section>
+            )}
 
             {/* Breeding */}
-            <Section icon={<Thermometer size={16} />} label={t("breeding")}>
-              <div className="border border-border bg-surface p-6">
-                <p className="font-sans text-body-md text-text2 leading-relaxed">
-                  {species.breeding}
-                </p>
-              </div>
-            </Section>
+            {(breeding || species.rearingDifficulty || species.parthenogenetic !== null || incubationRange) && (
+              <Section icon={<Thermometer size={16} />} label={t("breeding")}>
+                <div className="border border-border bg-surface p-6 space-y-6">
+                  {breeding && (
+                    <p className="font-sans text-body-md text-text2 leading-relaxed">
+                      {breeding}
+                    </p>
+                  )}
+
+                  {(species.rearingDifficulty || species.parthenogenetic !== null || incubationRange) && (
+                    <div className="flex flex-wrap gap-3 pt-2 border-t border-border">
+                      {species.rearingDifficulty && (
+                        <Fact label={t("rearing_difficulty")} value={rearingLabel[species.rearingDifficulty]} />
+                      )}
+                      {species.parthenogenetic !== null && (
+                        <Fact
+                          label={t("parthenogenetic_label")}
+                          value={species.parthenogenetic ? t("parthenogenetic_yes") : t("parthenogenetic_no")}
+                        />
+                      )}
+                      {incubationRange && (
+                        <Fact label={t("incubation_label")} value={`${incubationRange} ${t("months_unit")}`} />
+                      )}
+                    </div>
+                  )}
+                </div>
+              </Section>
+            )}
 
             {/* Gallery */}
-            {species.gallery.length > 0 && (
+            {gallery.length > 0 && (
               <Section icon={null} label={t("gallery")}>
-                <SpeciesGallery images={species.gallery} />
+                <SpeciesGallery images={gallery} />
               </Section>
             )}
 
             {/* References */}
-            <Section icon={<BookOpen size={16} />} label={t("bibliography")}>
-              <ol className="space-y-3">
-                {species.references.map((ref, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <span className="font-mono text-caption text-gold shrink-0 mt-0.5">
-                      [{i + 1}]
-                    </span>
-                    <p className="font-mono text-caption text-text2 leading-relaxed">{ref}</p>
-                  </li>
-                ))}
-              </ol>
-            </Section>
+            {species.references.length > 0 && (
+              <Section icon={<BookOpen size={16} />} label={t("bibliography")}>
+                <ol className="space-y-3">
+                  {species.references.map((ref, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="font-mono text-caption text-gold shrink-0 mt-0.5">
+                        [{i + 1}]
+                      </span>
+                      <p className="font-mono text-caption text-text2 leading-relaxed">{ref}</p>
+                    </li>
+                  ))}
+                </ol>
+              </Section>
+            )}
           </div>
 
           {/* ── RIGHT: taxonomy sidebar ── */}
@@ -200,24 +311,31 @@ export default async function SpeciesDetailPage({
                   </p>
                 </div>
                 <div className="divide-y divide-border">
-                  {[
-                    ["Orden", species.order],
-                    ["Familia", species.family],
-                    ["Subfamilia", species.subfamily],
-                    ["Género", species.genus],
-                    ["Especie", species.scientificName.split(" ").slice(1).join(" ")],
-                    ["Autor", species.author],
-                    ["Año", String(species.year)],
-                  ].map(([label, value]) => (
-                    <div key={label} className="flex justify-between px-6 py-3">
-                      <span className="font-mono text-caption text-text3 uppercase tracking-wide">
-                        {label}
-                      </span>
-                      <span className="font-sans text-body-md text-text1 text-right max-w-[55%]">
-                        {value}
-                      </span>
-                    </div>
-                  ))}
+                  {(
+                    [
+                      ["Orden", species.order],
+                      ["Familia", species.family],
+                      ["Subfamilia", species.subfamily],
+                      species.tribe ? ["Tribu", species.tribe] : null,
+                      ["Género", species.genus],
+                      ["Especie", species.scientificName.split(" ").slice(1).join(" ")],
+                      ["Autor", species.author],
+                      ["Año", species.year ? String(species.year) : null],
+                      species.synonyms.length > 0 ? ["Sinónimos", species.synonyms.join(", ")] : null,
+                      species.typeLocality ? ["Localidad tipo", species.typeLocality] : null,
+                    ] as ([string, string | null] | null)[]
+                  )
+                    .filter((row): row is [string, string] => !!row && !!row[1])
+                    .map(([label, value]) => (
+                      <div key={label} className="flex justify-between gap-4 px-6 py-3">
+                        <span className="font-mono text-caption text-text3 uppercase tracking-wide shrink-0">
+                          {label}
+                        </span>
+                        <span className="font-sans text-body-md text-text1 text-right max-w-[65%]">
+                          {value}
+                        </span>
+                      </div>
+                    ))}
                 </div>
               </div>
 
@@ -280,21 +398,23 @@ export default async function SpeciesDetailPage({
               </div>
 
               {/* Tags */}
-              <div className="border border-border bg-surface px-6 py-5">
-                <p className="font-mono text-caption text-text3 uppercase tracking-widest mb-3">
-                  {t("tags_label")}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {species.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="font-mono text-caption text-text2 border border-border px-3 py-1.5"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+              {species.tags.length > 0 && (
+                <div className="border border-border bg-surface px-6 py-5">
+                  <p className="font-mono text-caption text-text3 uppercase tracking-widest mb-3">
+                    {t("tags_label")}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {species.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="font-mono text-caption text-text2 border border-border px-3 py-1.5"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Related species */}
               <div className="border border-border bg-surface">
@@ -305,20 +425,23 @@ export default async function SpeciesDetailPage({
                 </div>
                 <div className="divide-y divide-border">
                   {relatedSpecies.map((rel) => {
-                    const relName = locale === "en" && rel.commonNameEn ? rel.commonNameEn : rel.commonNameEs;
+                    const relName =
+                      (isEn ? rel.commonNameEn : rel.commonNameEs) ?? rel.commonNameEs ?? rel.scientificName;
                     return (
                       <Link
                         key={rel.id}
                         href={`/especies/${rel.slug}`}
                         className="flex items-center gap-4 px-6 py-4 hover:bg-void transition-colors duration-300 group"
                       >
-                        <div className="relative w-14 h-14 shrink-0 overflow-hidden">
-                          <Image
-                            src={rel.image}
-                            alt={rel.scientificName}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-400"
-                          />
+                        <div className="relative w-14 h-14 shrink-0 overflow-hidden bg-surface">
+                          {rel.image && (
+                            <Image
+                              src={rel.image}
+                              alt={rel.scientificName}
+                              fill
+                              className="object-cover group-hover:scale-105 transition-transform duration-400"
+                            />
+                          )}
                         </div>
                         <div>
                           <p className="font-mono text-caption text-gold italic">{rel.scientificName}</p>
@@ -366,11 +489,31 @@ function Section({
   );
 }
 
-function MorphCard({ title, content }: { title: string; content: string }) {
+function MorphCard({
+  title,
+  content,
+  lengthMm,
+}: {
+  title: string;
+  content: string;
+  lengthMm?: number | null;
+}) {
   return (
     <div className="border-l-2 border-gold pl-6">
-      <p className="font-mono text-caption text-gold uppercase tracking-widest mb-2">{title}</p>
+      <p className="font-mono text-caption text-gold uppercase tracking-widest mb-2">
+        {title}
+        {lengthMm ? <span className="text-text3 normal-case"> · {lengthMm} mm</span> : null}
+      </p>
       <p className="font-sans text-body-md text-text2 leading-relaxed">{content}</p>
+    </div>
+  );
+}
+
+function Fact({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="border border-border px-3 py-2">
+      <p className="font-mono text-caption text-text3 uppercase tracking-wide">{label}</p>
+      <p className="font-sans text-body-md text-text1">{value}</p>
     </div>
   );
 }

@@ -7,13 +7,8 @@ import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import {
-  PLACEHOLDER_SPECIES,
-  FAMILIES,
-  STATUS_META,
-  type SpeciesPlaceholder,
-  type ConservationStatus,
-} from "@/lib/placeholder/species";
+import { STATUS_META, type ConservationStatus } from "@/lib/placeholder/species";
+import type { SpeciesCard as Species } from "@/lib/content/species";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,11 +17,11 @@ type OriginKey = "all" | "native" | "exotic" | "central" | "south" | "asia" | "a
 const ORIGIN_KEYS: OriginKey[] = ["all", "native", "exotic", "central", "south", "asia", "australia", "europe"];
 const STATUS_KEYS = ["", "LC", "NT", "VU", "EN", "CR", "NE", "DD"];
 
-function matchOrigin(species: SpeciesPlaceholder, filter: OriginKey): boolean {
+function matchOrigin(species: Species, filter: OriginKey): boolean {
   if (filter === "all") return true;
   if (filter === "native") return species.presenceInMexico;
   if (filter === "exotic") return !species.presenceInMexico;
-  const geo = species.geographicOrigin.toLowerCase();
+  const geo = (species.geographicOrigin ?? "").toLowerCase();
   if (filter === "central") return geo.includes("centroamérica") || geo.includes("panamá") || geo.includes("chiapas");
   if (filter === "south") return geo.includes("chile") || geo.includes("argentina") || geo.includes("brasil");
   if (filter === "asia") return geo.includes("malasia") || geo.includes("india") || geo.includes("asiático") || geo.includes("singapur");
@@ -35,7 +30,7 @@ function matchOrigin(species: SpeciesPlaceholder, filter: OriginKey): boolean {
   return true;
 }
 
-export default function CatalogGrid() {
+export default function CatalogGrid({ species }: { species: Species[] }) {
   const t = useTranslations("catalog.filters");
   const locale = useLocale();
 
@@ -61,12 +56,12 @@ export default function CatalogGrid() {
   };
 
   const filtered = useMemo(() => {
-    return PLACEHOLDER_SPECIES.filter((s) => {
+    return species.filter((s) => {
       const q = query.toLowerCase();
       const matchQ =
         !q ||
         s.scientificName.toLowerCase().includes(q) ||
-        s.commonNameEs.toLowerCase().includes(q) ||
+        (s.commonNameEs?.toLowerCase().includes(q) ?? false) ||
         (s.commonNameEn?.toLowerCase().includes(q) ?? false) ||
         s.family.toLowerCase().includes(q) ||
         s.tags.some((tag) => tag.toLowerCase().includes(q));
@@ -75,7 +70,7 @@ export default function CatalogGrid() {
       const matchStatus = !status || s.conservationStatus === status;
       return matchQ && matchFamily && matchOriginF && matchStatus;
     });
-  }, [query, family, origin, status]);
+  }, [species, query, family, origin, status]);
 
   const hasFilters = query || family || origin !== "all" || status;
 
@@ -96,10 +91,13 @@ export default function CatalogGrid() {
     );
   }, [filtered]);
 
-  // Build family options (exclude first element which is "Todas las familias")
+  // Derivadas del contenido publicado: una lista fija se desincroniza en
+  // cuanto se publica una especie de una familia que no estaba contemplada.
   const familyOptions = [
     { value: "", label: t("all_families") },
-    ...FAMILIES.slice(1).map((f) => ({ value: f, label: f })),
+    ...[...new Set(species.map((s) => s.family).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b))
+      .map((f) => ({ value: f, label: f })),
   ];
 
   const originOptions = ORIGIN_KEYS.map((key) => ({
@@ -144,7 +142,7 @@ export default function CatalogGrid() {
             {/* Count */}
             <p className="font-mono text-caption text-text3 ml-auto shrink-0">
               <span className="text-gold">{filtered.length}</span>
-              {" "}{t("count_of", { total: PLACEHOLDER_SPECIES.length })}
+              {" "}{t("count_of", { total: species.length })}
             </p>
 
             {/* Clear */}
@@ -209,24 +207,35 @@ export default function CatalogGrid() {
   );
 }
 
-function SpeciesCard({ species, locale }: { species: SpeciesPlaceholder; locale: string }) {
+function SpeciesCard({ species, locale }: { species: Species; locale: string }) {
   const statusMeta = STATUS_META[species.conservationStatus as ConservationStatus];
-  const commonName = locale === "en" && species.commonNameEn ? species.commonNameEn : species.commonNameEs;
+  const commonName =
+    (locale === "en" ? species.commonNameEn : species.commonNameEs) ??
+    species.commonNameEs ??
+    species.scientificName;
 
   return (
     <Link
       href={`/especies/${species.slug}`}
       className="catalog-card group block break-inside-avoid bg-void relative overflow-hidden"
-      style={{ aspectRatio: species.aspectRatio }}
+      style={{ aspectRatio: species.aspectRatio ?? 0.75 }}
     >
-      <Image
-        src={species.image}
-        alt={`${species.scientificName} — ${commonName}`}
-        fill
-        className="object-cover transition-transform duration-700 group-hover:scale-[1.06]"
-        style={{ transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)" }}
-        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-      />
+      {species.image ? (
+        <Image
+          src={species.image}
+          alt={species.imageAlt ?? `${species.scientificName} — ${commonName}`}
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+          style={{ transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)" }}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-surface flex items-center justify-center">
+          <span className="font-mono text-caption text-text3 uppercase tracking-widest">
+            Sin fotografía
+          </span>
+        </div>
+      )}
 
       <div className="absolute inset-0 bg-gradient-to-t from-void/90 via-void/20 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-void via-void/70 to-void/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

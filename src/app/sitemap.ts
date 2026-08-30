@@ -1,12 +1,20 @@
 import type { MetadataRoute } from "next";
-import { PLACEHOLDER_SPECIES } from "@/lib/placeholder/species";
-import { PLACEHOLDER_ARTICLES } from "@/lib/placeholder/articles";
+import { getSpeciesSlugs } from "@/lib/content/species";
+import { getArticleSlugs } from "@/lib/content/articles";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://phasmamx.com";
 const LOCALES = ["es", "en"] as const;
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+  // Los slugs son lo único que expone el índice de Sanity; no traemos fecha de
+  // publicación por artículo aquí (sería una query aparte). Usamos "now" para
+  // todo el contenido, igual que las rutas estáticas de abajo — un sitemap no
+  // necesita fechas exactas, solo señal de que existe y una prioridad/frecuencia.
+  const [speciesSlugs, articleSlugs] = await Promise.all([
+    getSpeciesSlugs(),
+    getArticleSlugs(),
+  ]);
 
   // Static pages — [path, priority, changeFrequency]
   const staticRoutes: [string, number, MetadataRoute.Sitemap[number]["changeFrequency"]][] = [
@@ -46,30 +54,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
   );
 
   // Species detail pages
-  const speciesEntries = PLACEHOLDER_SPECIES.flatMap((species) =>
+  const speciesEntries = speciesSlugs.flatMap((slug) =>
     LOCALES.map((locale) => ({
-      url: `${BASE_URL}/${locale}/especies/${species.slug}`,
+      url: `${BASE_URL}/${locale}/especies/${slug}`,
       lastModified: now,
       changeFrequency: "monthly" as const,
       priority: 0.7,
       alternates: {
         languages: Object.fromEntries(
-          LOCALES.map((l) => [l, `${BASE_URL}/${l}/especies/${species.slug}`])
+          LOCALES.map((l) => [l, `${BASE_URL}/${l}/especies/${slug}`])
         ),
       },
     }))
   );
 
   // Article detail pages
-  const articleEntries = PLACEHOLDER_ARTICLES.flatMap((article) =>
+  const articleEntries = articleSlugs.flatMap((slug) =>
     LOCALES.map((locale) => ({
-      url: `${BASE_URL}/${locale}/articulos/${article.slug}`,
-      lastModified: new Date(article.publishedAt),
+      url: `${BASE_URL}/${locale}/articulos/${slug}`,
+      lastModified: now,
       changeFrequency: "yearly" as const,
       priority: 0.6,
       alternates: {
         languages: Object.fromEntries(
-          LOCALES.map((l) => [l, `${BASE_URL}/${l}/articulos/${article.slug}`])
+          LOCALES.map((l) => [l, `${BASE_URL}/${l}/articulos/${slug}`])
         ),
       },
     }))

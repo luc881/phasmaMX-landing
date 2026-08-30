@@ -8,18 +8,22 @@ import { Link } from "@/i18n/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
-  PLACEHOLDER_ARTICLES,
   CATEGORIES,
   CATEGORY_META,
   formatDate,
-  localizeArticle,
-  type ArticlePlaceholder,
-  type ArticleCategory,
 } from "@/lib/placeholder/articles";
+import type { ArticleCard } from "@/lib/content/articles";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function ArticlesGrid() {
+/** Título/extracto según locale; cae a ES si el campo EN viene vacío. */
+function localize(article: ArticleCard, locale: string) {
+  const title = locale === "en" && article.titleEn ? article.titleEn : article.titleEs;
+  const excerpt = (locale === "en" && article.excerptEn ? article.excerptEn : article.excerpt) ?? "";
+  return { ...article, title, excerpt };
+}
+
+export default function ArticlesGrid({ articles }: { articles: ArticleCard[] }) {
   const t = useTranslations("articles_page");
   const locale = useLocale();
   const [activeCategory, setActiveCategory] = useState("all");
@@ -27,11 +31,11 @@ export default function ArticlesGrid() {
   const filterRef = useRef<HTMLDivElement>(null);
 
   const filtered = useMemo(() => {
-    const articles = activeCategory === "all"
-      ? PLACEHOLDER_ARTICLES
-      : PLACEHOLDER_ARTICLES.filter((a) => a.category === activeCategory);
-    return articles.map((a) => localizeArticle(a, locale));
-  }, [activeCategory, locale]);
+    const scoped = activeCategory === "all"
+      ? articles
+      : articles.filter((a) => a.category === activeCategory);
+    return scoped.map((a) => localize(a, locale));
+  }, [articles, activeCategory, locale]);
 
   const [featured, ...rest] = filtered;
 
@@ -124,17 +128,26 @@ export default function ArticlesGrid() {
 }
 
 type TFn = ReturnType<typeof useTranslations<"articles_page">>;
+type LocalizedArticle = ReturnType<typeof localize>;
+
+// Sin foto (p.ej. "conservacion-phasmatodea-lista-roja") o sin autor: no debe romper la ficha.
+function authorInitials(article: ArticleCard) {
+  return article.author?.initials ?? "PM";
+}
+function authorName(article: ArticleCard) {
+  return article.author?.name ?? "Phasma MX";
+}
 
 function FeaturedCard({
   article,
   locale,
   t,
 }: {
-  article: ArticlePlaceholder & { title: string };
+  article: LocalizedArticle;
   locale: string;
   t: TFn;
 }) {
-  const meta = CATEGORY_META[article.category as ArticleCategory];
+  const meta = CATEGORY_META[article.category];
 
   return (
     <Link
@@ -142,15 +155,21 @@ function FeaturedCard({
       className="group grid grid-cols-1 lg:grid-cols-12 bg-surface border border-border overflow-hidden hover:border-border2 transition-colors duration-400"
     >
       <div className="lg:col-span-7 relative overflow-hidden" style={{ minHeight: 420 }}>
-        <Image
-          src={article.image}
-          alt={article.title}
-          fill
-          priority
-          className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-          style={{ transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}
-          sizes="(max-width: 1024px) 100vw, 60vw"
-        />
+        {article.image ? (
+          <Image
+            src={article.image}
+            alt={article.title}
+            fill
+            priority
+            className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+            style={{ transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}
+            sizes="(max-width: 1024px) 100vw, 60vw"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-void flex items-center justify-center">
+            <span className="font-mono text-caption text-text3 uppercase tracking-widest">Sin fotografía</span>
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-surface lg:block hidden" />
         <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent lg:hidden" />
       </div>
@@ -163,7 +182,7 @@ function FeaturedCard({
           <span className="font-mono text-caption text-text3">·</span>
           <span className="font-mono text-caption text-text3 flex items-center gap-1.5">
             <Clock size={11} />
-            {article.readingMinutes} min
+            {article.readingMinutes ?? "—"} min
           </span>
         </div>
 
@@ -179,11 +198,11 @@ function FeaturedCard({
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 bg-gold flex items-center justify-center shrink-0">
               <span className="font-mono text-caption text-void font-bold" style={{ fontSize: "9px" }}>
-                {article.author.initials}
+                {authorInitials(article)}
               </span>
             </div>
             <div>
-              <p className="font-sans text-body-md text-text1 leading-none">{article.author.name}</p>
+              <p className="font-sans text-body-md text-text1 leading-none">{authorName(article)}</p>
               <p className="font-mono text-caption text-text3 mt-0.5">{formatDate(article.publishedAt, locale)}</p>
             </div>
           </div>
@@ -204,11 +223,11 @@ function SmallCard({
   locale,
   t,
 }: {
-  article: ArticlePlaceholder & { title: string };
+  article: LocalizedArticle;
   locale: string;
   t: TFn;
 }) {
-  const meta = CATEGORY_META[article.category as ArticleCategory];
+  const meta = CATEGORY_META[article.category];
 
   return (
     <Link
@@ -216,14 +235,20 @@ function SmallCard({
       className="group flex flex-col h-full hover:bg-surface transition-colors duration-400"
     >
       <div className="relative overflow-hidden" style={{ aspectRatio: "16/9" }}>
-        <Image
-          src={article.image}
-          alt={article.title}
-          fill
-          className="object-cover transition-transform duration-600 group-hover:scale-[1.05]"
-          style={{ transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}
-          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-        />
+        {article.image ? (
+          <Image
+            src={article.image}
+            alt={article.title}
+            fill
+            className="object-cover transition-transform duration-600 group-hover:scale-[1.05]"
+            style={{ transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-surface flex items-center justify-center">
+            <span className="font-mono text-caption text-text3 uppercase tracking-widest">Sin fotografía</span>
+          </div>
+        )}
         <div className="absolute top-3 left-3">
           <span className={`font-mono text-caption uppercase tracking-widest px-2 py-1 bg-void/80 backdrop-blur-sm ${meta.color}`}>
             {t(meta.translationKey as Parameters<typeof t>[0])}
@@ -244,14 +269,14 @@ function SmallCard({
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 bg-gold flex items-center justify-center shrink-0">
               <span className="font-mono text-void font-bold" style={{ fontSize: "7px" }}>
-                {article.author.initials}
+                {authorInitials(article)}
               </span>
             </div>
-            <span className="font-mono text-caption text-text3">{article.author.name.split(" ").slice(-1)}</span>
+            <span className="font-mono text-caption text-text3">{authorName(article).split(" ").slice(-1)}</span>
           </div>
           <div className="flex items-center gap-2 text-text3">
             <Clock size={10} />
-            <span className="font-mono text-caption">{article.readingMinutes} min</span>
+            <span className="font-mono text-caption">{article.readingMinutes ?? "—"} min</span>
             <span className="font-mono text-caption text-border2">·</span>
             <span className="font-mono text-caption">{formatDate(article.publishedAt, locale).split(" ").slice(-1)[0]}</span>
           </div>

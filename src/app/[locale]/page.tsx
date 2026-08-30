@@ -8,8 +8,9 @@ import DistributionMap from "@/components/sections/DistributionMap";
 import CatalogCTA from "@/components/sections/CatalogCTA";
 import SectionRule from "@/components/ui/SectionRule";
 import TaxonMarquee from "@/components/ui/TaxonMarquee";
-import { PLACEHOLDER_SPECIES } from "@/lib/placeholder/species";
-import { PLACEHOLDER_ARTICLES, formatDate } from "@/lib/placeholder/articles";
+import { getFeaturedSpecies, getSpeciesCatalog } from "@/lib/content/species";
+import { getArticlesIndex, getLatestArticles } from "@/lib/content/articles";
+import { formatDate } from "@/lib/placeholder/articles";
 import { MEXICO_STATES_WITH_RECORDS } from "@/lib/placeholder/distribution";
 
 type Props = {
@@ -26,11 +27,22 @@ export default async function HomePage({ params }: Props) {
 
   const t = await getTranslations("sections");
 
+  const [featuredSpecies, catalog, latestArticles, articlesIndex] = await Promise.all([
+    getFeaturedSpecies(),
+    getSpeciesCatalog(),
+    getLatestArticles(),
+    getArticlesIndex(),
+  ]);
+
+  // Ninguna especie tiene `featured` marcado todavía: el contenido se cargó
+  // desde el placeholder, que no tenía ese concepto. Sin este fallback la
+  // sección quedaría en blanco, así que cae al catálogo recortado.
+  const featured = featuredSpecies.length > 0 ? featuredSpecies : catalog.slice(0, 6);
+
   // Las reglas separadoras dicen algo que su sección no repite: el pulso del
   // archivo, la fecha real del último ingreso y la cobertura total.
-  const lastEntry = PLACEHOLDER_ARTICLES.reduce((a, b) =>
-    a.publishedAt > b.publishedAt ? a : b
-  ).publishedAt;
+  // `latestArticles` ya viene ordenado por fecha desc, así el primero es el más reciente.
+  const lastEntry = latestArticles[0]?.publishedAt ?? new Date().toISOString();
 
   const totalRecords = MEXICO_STATES_WITH_RECORDS.reduce(
     (sum, state) => sum + state.count,
@@ -45,14 +57,14 @@ export default async function HomePage({ params }: Props) {
         <SectionRule
           label={t("archive_label")}
           value={t("archive_count", {
-            species: PLACEHOLDER_SPECIES.length,
-            articles: PLACEHOLDER_ARTICLES.length,
+            species: catalog.length,
+            articles: articlesIndex.length,
           })}
         />
       </div>
 
-      <FeaturedSpecies />
-      <TaxonMarquee />
+      <FeaturedSpecies species={featured} />
+      <TaxonMarquee species={catalog} />
       <PhasmidsIntro />
 
       <SectionRule
@@ -60,7 +72,7 @@ export default async function HomePage({ params }: Props) {
         value={formatDate(lastEntry, locale)}
       />
 
-      <LatestArticles />
+      <LatestArticles articles={latestArticles} />
 
       <SectionRule
         label={t("rule_coverage_label")}
