@@ -126,6 +126,7 @@ export default function SpeciesIndex({
                       src: s.image,
                       alt: `${s.scientificName} — ${commonName(s)}`,
                       catalogNum: s.catalogNum ?? undefined,
+                      aspectRatio: s.aspectRatio,
                     },
                     e
                   )

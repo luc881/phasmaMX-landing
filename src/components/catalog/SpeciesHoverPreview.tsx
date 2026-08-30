@@ -20,6 +20,8 @@ export type SpeciesPreviewData = {
   src: string | null;
   alt: string;
   catalogNum?: string;
+  /** ancho/alto del original, de los metadatos del asset en Sanity. */
+  aspectRatio?: number | null;
 };
 
 export type SpeciesHoverPreviewHandle = {
@@ -33,15 +35,24 @@ export type SpeciesHoverPreviewHandle = {
   hide: () => void;
 };
 
-const WIDTH = 320;
-const HEIGHT = 260;
-
 /**
- * Caja de tamaño fijo: cajas de alto variable saltaban de una fila a otra y se
- * leía como un fallo. La foto va con `object-contain` dentro, así que entra
- * entera —vertical, cuadrada o apaisada— sin recortarse por el eje largo del
- * insecto, que es justo lo que hay que ver.
+ * Dos formas de caja, no un tamaño por foto.
+ *
+ * Con una única caja vertical, las fotos apaisadas salían cortadas justo por el
+ * eje largo del insecto. Con la caja adaptada a cada proporción, saltaba de
+ * tamaño al pasar de fila y parecía un fallo. Y con `object-contain` aparecían
+ * bandas vacías a los lados.
+ *
+ * Así que: caja vertical para lo vertical, apaisada para lo apaisado, y
+ * `object-cover` en ambas. La foto siempre llena la caja, y como la caja ya
+ * tiene su orientación, el recorte es mínimo.
  */
+const PORTRAIT = { width: 300, height: 420 };
+const LANDSCAPE = { width: 460, height: 300 };
+
+function boxFor(ratio: number | null | undefined) {
+  return ratio && ratio > 1.15 ? LANDSCAPE : PORTRAIT;
+}
 const CURSOR_OFFSET = 28;
 const EDGE_MARGIN = 12;
 const LERP_FACTOR = 0.18;
@@ -59,6 +70,7 @@ const SpeciesHoverPreview = forwardRef<SpeciesHoverPreviewHandle>((_props, ref) 
   const hasPositioned = useRef(false);
   const rafId = useRef<number | null>(null);
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const boxRef = useRef(PORTRAIT);
   const isTouch = useRef(false);
   const reducedMotion = useRef(false);
 
@@ -70,14 +82,15 @@ const SpeciesHoverPreview = forwardRef<SpeciesHoverPreviewHandle>((_props, ref) 
   }, []);
 
   const place = useCallback((x: number, y: number) => {
+    const { width: bw, height: bh } = boxRef.current;
     let px = x + CURSOR_OFFSET;
     let py = y + CURSOR_OFFSET;
     // Si no cabe a la derecha/abajo, se coloca al otro lado del cursor.
-    if (px + WIDTH + EDGE_MARGIN > window.innerWidth) px = x - CURSOR_OFFSET - WIDTH;
-    if (py + HEIGHT + EDGE_MARGIN > window.innerHeight) py = y - CURSOR_OFFSET - HEIGHT;
+    if (px + bw + EDGE_MARGIN > window.innerWidth) px = x - CURSOR_OFFSET - bw;
+    if (py + bh + EDGE_MARGIN > window.innerHeight) py = y - CURSOR_OFFSET - bh;
     // Cinturón de seguridad: nunca se sale de la ventana.
-    px = Math.min(Math.max(px, EDGE_MARGIN), window.innerWidth - WIDTH - EDGE_MARGIN);
-    py = Math.min(Math.max(py, EDGE_MARGIN), window.innerHeight - HEIGHT - EDGE_MARGIN);
+    px = Math.min(Math.max(px, EDGE_MARGIN), window.innerWidth - bw - EDGE_MARGIN);
+    py = Math.min(Math.max(py, EDGE_MARGIN), window.innerHeight - bh - EDGE_MARGIN);
     return { x: px, y: py };
   }, []);
 
@@ -109,6 +122,7 @@ const SpeciesHoverPreview = forwardRef<SpeciesHoverPreviewHandle>((_props, ref) 
           clearTimeout(hideTimeout.current);
           hideTimeout.current = null;
         }
+        boxRef.current = boxFor(data.aspectRatio);
         setItem(data);
         setVisible(true);
 
@@ -170,7 +184,7 @@ const SpeciesHoverPreview = forwardRef<SpeciesHoverPreviewHandle>((_props, ref) 
       className={`fixed left-0 top-0 z-50 overflow-hidden rounded border border-border bg-surface pointer-events-none transition-opacity duration-300 ease-out ${
         visible ? "opacity-100" : "opacity-0"
       }`}
-      style={{ width: WIDTH, height: HEIGHT, willChange: "transform" }}
+      style={{ ...boxFor(item?.aspectRatio), willChange: "transform" }}
     >
       {item?.src ? (
         <Image
@@ -178,8 +192,8 @@ const SpeciesHoverPreview = forwardRef<SpeciesHoverPreviewHandle>((_props, ref) 
           src={item.src}
           alt={item.alt}
           fill
-          sizes={`${WIDTH}px`}
-          className="object-contain"
+          sizes={`${LANDSCAPE.width}px`}
+          className="object-cover"
         />
       ) : (
         <div className="absolute inset-0 flex items-center justify-center bg-surface px-4 text-center">
