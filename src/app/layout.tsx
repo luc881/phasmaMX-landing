@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ALLOW_INDEXING } from "./robots";
 
 export const metadata: Metadata = {
   title: {
@@ -13,6 +14,9 @@ export const metadata: Metadata = {
     locale: "es_MX",
     siteName: "Phasma MX",
   },
+  // `disallow` en robots.txt no impide que Google indexe una URL que alguien
+  // enlace desde fuera: solo le impide rastrearla. La meta sí lo impide.
+  robots: ALLOW_INDEXING ? undefined : { index: false, follow: false },
 };
 
 /**

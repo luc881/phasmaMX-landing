@@ -24,6 +24,23 @@ import { groq } from "next-sanity";
  * Al conectar la ficha de especie hace falta un renderer de Portable Text.
  */
 
+/**
+ * Sanity redimensiona y recodifica en su CDN, así que no tiene sentido darle a
+ * Next el original completo solo para que lo encoja.
+ *
+ * Dos cosas medidas sobre una foto real del catálogo (800×1200, 122 KB JPEG),
+ * las dos contraintuitivas:
+ *
+ * 1. `q` es obligatorio. Sin él, la conversión a WebP sale a calidad alta y
+ *    puede pesar MÁS que el original. Con `q=75` baja a 63 KB.
+ * 2. Sanity SÍ reescala hacia arriba. Pedir `w=1600` sobre un original de
+ *    800px lo agranda hasta 128 KB en vez de recortarlo. Por eso las imágenes
+ *    grandes van sin `w`: se sirven a su resolución nativa y Next genera desde
+ *    ahí. El `w` se reserva para lo que se pinta pequeño de verdad.
+ */
+const img = (path: string, width?: number) =>
+  /* groq */ `${path}.asset->url + "?${width ? `w=${width}&` : ""}auto=format&q=75"`;
+
 /** Portable Text con los assets de las imágenes ya resueltos a URL. */
 const PROSE = (field: string) => /* groq */ `
   "${field}": ${field}[]{
@@ -51,7 +68,7 @@ const SPECIES_CARD_FIELDS = /* groq */ `
   "presenceInMexico": coalesce(presenceInMexico, false),
   nativeToMexico,
   "mexicoStates": coalesce(mexicoStates, []),
-  "image": mainImage.asset->url,
+  "image": ${img("mainImage")},
   "imageAlt": mainImage.alt,
   "aspectRatio": mainImage.asset->metadata.dimensions.aspectRatio,
   "tags": coalesce(tags, []),
@@ -112,7 +129,7 @@ export const speciesDetailQuery = groq`
     breeding,
     breedingEn,
     "gallery": coalesce(gallery[]{
-      "src": asset->url,
+      "src": ${img("@")},
       caption,
       credit,
       alt
@@ -147,7 +164,7 @@ const ARTICLE_CARD_FIELDS = /* groq */ `
   category,
   excerpt,
   excerptEn,
-  "image": mainImage.asset->url,
+  "image": ${img("mainImage")},
   "imageCaption": mainImage.caption,
   "tags": coalesce(tags, []),
   author-> {
@@ -187,7 +204,7 @@ export const articleDetailQuery = groq`
       commonNameEs,
       commonNameEn,
       "slug": slug.current,
-      "image": mainImage.asset->url
+      "image": ${img("mainImage", 400)}
     }
   }
 `;
@@ -203,7 +220,7 @@ export const searchIndexQuery = groq`{
     catalogNum,
     psgNumber,
     "tags": coalesce(tags, []),
-    "image": mainImage.asset->url
+    "image": ${img("mainImage", 160)}
   },
   "articles": *[_type == "article"] | order(publishedAt desc) {
     "slug": slug.current,
@@ -215,7 +232,7 @@ export const searchIndexQuery = groq`{
     excerpt,
     excerptEn,
     "tags": coalesce(tags, []),
-    "image": mainImage.asset->url
+    "image": ${img("mainImage", 160)}
   }
 }`;
 
