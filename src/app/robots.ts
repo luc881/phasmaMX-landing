@@ -1,6 +1,16 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://phasmamx.com";
+/**
+ * `||` y no `??`: una variable declarada pero vacía en el panel del host deja
+ * `BASE_URL` en "" y el sitemap sale con URLs relativas (`<loc>/es</loc>`),
+ * que Google rechaza. Vercel expone el dominio de producción por su cuenta,
+ * así que en el caso normal no hay que configurar nada.
+ */
+const BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "https://phasmamx.com");
 
 /**
  * La indexación está cerrada salvo que se abra explícitamente.
