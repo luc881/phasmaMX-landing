@@ -131,7 +131,21 @@
     "contribute_label": "Know an unregistered species?",
     "contribute_title": "Contribute to the archive",
     "contribute_body": "If you have field photographs, distribution data or publications on phasmids in Mexico or Latin America, contact us to collaborate.",
-    "contribute_btn": "How to collaborate"
+    "contribute_btn": "How to collaborate",
+    "view_grid": "Grid",
+    "view_index": "Index",
+    "view_label": "View",
+    "col_catalog": "Catalog",
+    "col_species": "Species",
+    "col_common": "Common name",
+    "col_family": "Family",
+    "col_status": "IUCN",
+    "sort_label": "Sort by",
+    "sort_family": "Family",
+    "sort_catalog": "Catalog no.",
+    "sort_name": "Scientific name",
+    "sort_status": "Conservation status",
+    "no_family": "No family assigned"
   },
   "species_detail": {
     "back": "Catalog",

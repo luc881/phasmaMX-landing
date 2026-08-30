@@ -2,13 +2,14 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import Image from "next/image";
-import { Search, SlidersHorizontal, X, ArrowUpRight } from "lucide-react";
+import { Search, SlidersHorizontal, X, ArrowUpRight, LayoutGrid, List } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { STATUS_META, type ConservationStatus } from "@/lib/placeholder/species";
 import type { SpeciesCard as Species } from "@/lib/content/species";
+import SpeciesIndex from "./SpeciesIndex";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -32,6 +33,7 @@ function matchOrigin(species: Species, filter: OriginKey): boolean {
 
 export default function CatalogGrid({ species }: { species: Species[] }) {
   const t = useTranslations("catalog.filters");
+  const tCatalog = useTranslations("catalog");
   const locale = useLocale();
 
   const [query, setQuery] = useState("");
@@ -39,6 +41,9 @@ export default function CatalogGrid({ species }: { species: Species[] }) {
   const [origin, setOrigin] = useState<OriginKey>("all");
   const [status, setStatus] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  // El índice va por defecto: con el catálogo creciendo, recorrer una tabla es
+  // más rápido que mirar fotos. La cuadrícula sigue a un clic.
+  const [view, setView] = useState<"index" | "grid">("index");
   const gridRef = useRef<HTMLDivElement>(null);
 
   const originLabel = (key: OriginKey) => {
@@ -139,8 +144,29 @@ export default function CatalogGrid({ species }: { species: Species[] }) {
               {t("filters_btn")}
             </button>
 
+            {/* Vista */}
+            <div className="flex items-center border border-border ml-auto shrink-0">
+              {([
+                ["index", List, "view_index"],
+                ["grid", LayoutGrid, "view_grid"],
+              ] as const).map(([key, Icon, labelKey]) => (
+                <button
+                  key={key}
+                  onClick={() => setView(key)}
+                  aria-pressed={view === key}
+                  title={tCatalog(labelKey)}
+                  className={`flex items-center gap-2 px-3 py-2 font-mono text-caption uppercase tracking-widest transition-colors duration-300 ${
+                    view === key ? "text-gold" : "text-text3 hover:text-text1"
+                  }`}
+                >
+                  <Icon size={13} />
+                  <span className="hidden lg:inline">{tCatalog(labelKey)}</span>
+                </button>
+              ))}
+            </div>
+
             {/* Count */}
-            <p className="font-mono text-caption text-text3 ml-auto shrink-0">
+            <p className="font-mono text-caption text-text3 shrink-0">
               <span className="text-gold">{filtered.length}</span>
               {" "}{t("count_of", { total: species.length })}
             </p>
@@ -197,11 +223,15 @@ export default function CatalogGrid({ species }: { species: Species[] }) {
           </button>
         </div>
       ) : (
-        <div ref={gridRef} className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-px bg-border">
-          {filtered.map((species) => (
-            <SpeciesCard key={species.id} species={species} locale={locale} />
-          ))}
-        </div>
+        view === "index" ? (
+          <SpeciesIndex species={filtered} locale={locale} />
+        ) : (
+          <div ref={gridRef} className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-px bg-border">
+            {filtered.map((species) => (
+              <SpeciesCard key={species.id} species={species} locale={locale} />
+            ))}
+          </div>
+        )
       )}
     </div>
   );

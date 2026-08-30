@@ -131,7 +131,21 @@
     "contribute_label": "¿Conoces una especie no registrada?",
     "contribute_title": "Contribuye al archivo",
     "contribute_body": "Si tienes registros fotográficos, datos de campo o publicaciones sobre fásmidos en México o América Latina, contáctanos para colaborar.",
-    "contribute_btn": "Cómo colaborar"
+    "contribute_btn": "Cómo colaborar",
+    "view_grid": "Cuadrícula",
+    "view_index": "Índice",
+    "view_label": "Vista",
+    "col_catalog": "Catálogo",
+    "col_species": "Especie",
+    "col_common": "Nombre común",
+    "col_family": "Familia",
+    "col_status": "UICN",
+    "sort_label": "Ordenar por",
+    "sort_family": "Familia",
+    "sort_catalog": "Nº de catálogo",
+    "sort_name": "Nombre científico",
+    "sort_status": "Estado de conservación",
+    "no_family": "Sin familia asignada"
   },
   "species_detail": {
     "back": "Catálogo",
