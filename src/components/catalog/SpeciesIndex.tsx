@@ -14,7 +14,7 @@ import {
 import SpeciesHoverPreview, {
   type SpeciesHoverPreviewHandle,
 } from "./SpeciesHoverPreview";
-import { useScrollWave } from "./useScrollWave";
+import { WAVE_ROW_ATTR, useScrollWave } from "./useScrollWave";
 
 const SORT_KEYS: SortKey[] = [
   "family",
@@ -42,7 +42,7 @@ export default function SpeciesIndex({
   const t = useTranslations("catalog");
   const [sort, setSort] = useState<SortKey>("family");
   const previewRef = useRef<SpeciesHoverPreviewHandle>(null);
-  const registerRow = useScrollWave();
+  const waveRef = useScrollWave();
 
   const grouped = sort === "family";
 
@@ -60,7 +60,7 @@ export default function SpeciesIndex({
     s.scientificName;
 
   return (
-    <div>
+    <div ref={waveRef}>
       {/* Selector de orden */}
       <div className="container-site flex items-center gap-3 flex-wrap py-6">
         <span className="font-mono text-caption uppercase tracking-widest text-text3">
@@ -118,7 +118,7 @@ export default function SpeciesIndex({
             return (
               <Link
                 key={s.id}
-                ref={registerRow}
+                {...{ [WAVE_ROW_ATTR]: "" }}
                 href={`/especies/${s.slug}`}
                 onMouseEnter={(e) =>
                   previewRef.current?.show(
@@ -126,6 +126,7 @@ export default function SpeciesIndex({
                       src: s.image,
                       alt: `${s.scientificName} — ${commonName(s)}`,
                       catalogNum: s.catalogNum ?? undefined,
+                      aspectRatio: s.aspectRatio,
                     },
                     e
                   )

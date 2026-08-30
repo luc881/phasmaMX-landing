@@ -12,6 +12,8 @@ interface ScrollWaveOptions {
 }
 
 const OBSERVER_MARGIN = "300px 0px";
+/** Las filas se marcan con este atributo; el hook las busca dentro del contenedor. */
+export const WAVE_ROW_ATTR = "data-wave-row";
 
 /**
  * Lente de lectura: una línea fija de la ventana empuja hacia la derecha las
@@ -24,14 +26,17 @@ const OBSERVER_MARGIN = "300px 0px";
  * "temblor" general en vez de una marca estable.
  *
  * Uso:
- *   const registerRow = useScrollWave();
- *   {species.map((s) => <Link key={s.id} ref={registerRow} ...>)}
+ *   const containerRef = useScrollWave();
+ *   <div ref={containerRef}>
+ *     {species.map((s) => <Link key={s.id} data-wave-row ...>)}
+ *   </div>
  *
  * Escribe `transform` directamente en el DOM: ni estado de React ni re-renders.
  * Un IntersectionObserver mantiene el coste plano — solo se tocan las filas
  * cercanas a la ventana, da igual si la lista tiene cientos.
  */
 export function useScrollWave(options: ScrollWaveOptions = {}) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const opts = useRef({ amplitude: 70, radius: 300, lineRatio: 0.42 });
   opts.current = {
     amplitude: options.amplitude ?? 70,
@@ -77,46 +82,32 @@ export function useScrollWave(options: ScrollWaveOptions = {}) {
     if (frameRef.current === null) frameRef.current = requestAnimationFrame(paint);
   }, [paint]);
 
-  const registerRow = useCallback(
-    (el: HTMLElement | null) => {
-      if (!el || isReduced()) return;
-
-      if (!observerRef.current) {
-        observerRef.current = new IntersectionObserver(
-          (entries) => {
-            for (const entry of entries) {
-              const node = entry.target as HTMLElement;
-              if (entry.isIntersecting) {
-                activeRef.current.add(node);
-                node.style.willChange = "transform";
-              } else {
-                activeRef.current.delete(node);
-                node.style.willChange = "";
-                node.style.transform = "";
-              }
-            }
-            schedule();
-          },
-          { rootMargin: OBSERVER_MARGIN }
-        );
-      }
-
-      observerRef.current.observe(el);
-      schedule();
-
-      // React 19: el retorno del callback-ref es su limpieza.
-      return () => {
-        observerRef.current?.unobserve(el);
-        activeRef.current.delete(el);
-        el.style.transform = "";
-        el.style.willChange = "";
-      };
-    },
-    [schedule]
-  );
-
   useEffect(() => {
     if (isReduced()) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const node = entry.target as HTMLElement;
+          if (entry.isIntersecting) {
+            activeRef.current.add(node);
+            node.style.willChange = "transform";
+          } else {
+            activeRef.current.delete(node);
+            node.style.willChange = "";
+            node.style.transform = "";
+          }
+        }
+        schedule();
+      },
+      { rootMargin: OBSERVER_MARGIN }
+    );
+    observerRef.current = observer;
+
+    const rows = container.querySelectorAll<HTMLElement>(`[${WAVE_ROW_ATTR}]`);
+    rows.forEach((row) => observer.observe(row));
 
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
@@ -126,7 +117,7 @@ export function useScrollWave(options: ScrollWaveOptions = {}) {
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
       if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
-      observerRef.current?.disconnect();
+      observer.disconnect();
       observerRef.current = null;
       for (const el of activeRef.current) {
         el.style.transform = "";
@@ -136,5 +127,5 @@ export function useScrollWave(options: ScrollWaveOptions = {}) {
     };
   }, [schedule]);
 
-  return registerRow;
+  return containerRef;
 }
