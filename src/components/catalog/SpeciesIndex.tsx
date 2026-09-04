@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { STATUS_META, type ConservationStatus } from "@/lib/placeholder/species";
@@ -137,7 +138,29 @@ export default function SpeciesIndex({
                 onMouseLeave={() => previewRef.current?.hide()}
                 className="group block border-b border-border/60 hover:bg-surface transition-colors duration-300"
               >
-                <div className={`container-site py-3.5 md:py-3 ${GRID_COLS}`}>
+                <div className="container-site py-3.5 md:py-3 flex items-start gap-4 md:block md:gap-0">
+                  {/* Miniatura solo en móvil: ahí la previsualización al pasar
+                      el cursor está inhibida a propósito (no hay puntero fino),
+                      así que la fila se quedaba sin ninguna pista visual. En
+                      escritorio sobra, porque el hover ya muestra la fotografía
+                      grande. */}
+                  <div className="relative w-14 h-14 shrink-0 overflow-hidden border border-border bg-surface md:hidden">
+                    {s.image ? (
+                      <Image
+                        src={s.image}
+                        alt=""
+                        fill
+                        className="object-cover"
+                        sizes="56px"
+                      />
+                    ) : (
+                      <span className="absolute inset-0 flex items-center justify-center font-mono text-caption text-text3">
+                        —
+                      </span>
+                    )}
+                  </div>
+
+                  <div className={`min-w-0 flex-1 ${GRID_COLS}`}>
                   {/* Móvil: número y estado comparten línea. En md, `contents`
                       disuelve este envoltorio y cada celda va a su columna. */}
                   <div className="flex items-center justify-between gap-3 md:contents">
@@ -165,6 +188,7 @@ export default function SpeciesIndex({
                   <span className="hidden md:block md:col-start-4 md:row-start-1 font-mono text-caption text-text3 truncate">
                     {s.family}
                   </span>
+                  </div>
                 </div>
               </Link>
             );
