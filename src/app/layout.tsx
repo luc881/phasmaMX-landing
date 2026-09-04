@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { ALLOW_INDEXING } from "./robots";
 
 export const metadata: Metadata = {
@@ -17,6 +17,15 @@ export const metadata: Metadata = {
   // `disallow` en robots.txt no impide que Google indexe una URL que alguien
   // enlace desde fuera: solo le impide rastrearla. La meta sí lo impide.
   robots: ALLOW_INDEXING ? undefined : { index: false, follow: false },
+};
+
+/**
+ * Sin `initial-scale` el móvil no fija bien el zoom inicial y da saltos al
+ * rotar. Lo que salía servido era solo `width=device-width`.
+ */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 /**

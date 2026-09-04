@@ -146,7 +146,7 @@ export default function Header({ locale }: Props) {
               </Link>
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
-                className={`xl:hidden transition-colors duration-400 ${quietTone}`}
+                className={`xl:hidden -mr-2 p-2 transition-colors duration-400 ${quietTone}`}
                 aria-label="Menu"
               >
                 {menuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -179,7 +179,7 @@ export default function Header({ locale }: Props) {
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="font-display text-display-sm font-light text-text1 hover:text-gold transition-colors duration-400"
+              className="py-1 font-display text-display-sm font-light text-text1 hover:text-gold transition-colors duration-400"
             >
               {link.label}
             </Link>

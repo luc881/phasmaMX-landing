@@ -39,7 +39,7 @@ const config: Config = {
         sans:       ["var(--font-dm-sans)", "system-ui", "sans-serif"],
       },
       fontSize: {
-        "display-xl": ["clamp(4rem, 10vw, 9rem)",    { lineHeight: "0.9",  letterSpacing: "-0.03em" }],
+        "display-xl": ["clamp(2.75rem, 10vw, 9rem)", { lineHeight: "0.9",  letterSpacing: "-0.03em" }],
         "display-lg": ["clamp(3rem, 7vw, 6rem)",     { lineHeight: "0.95", letterSpacing: "-0.02em" }],
         "display-md": ["clamp(2rem, 4vw, 3.5rem)",   { lineHeight: "1.05", letterSpacing: "-0.02em" }],
         "display-sm": ["clamp(1.5rem, 3vw, 2.5rem)", { lineHeight: "1.1",  letterSpacing: "-0.01em" }],

@@ -119,10 +119,10 @@ export default function CatalogGrid({ species }: { species: Species[] }) {
     <div>
       {/* ── Filter bar ── */}
       <div className="sticky top-16 lg:top-20 z-30 bg-void/95 backdrop-blur-sm border-b border-border">
-        <div className="container-site py-4">
+        <div className="container-site py-3 md:py-4">
           <div className="flex items-center gap-3 flex-wrap">
             {/* Search */}
-            <div className="relative flex-1 min-w-52">
+            <div className="relative w-full sm:w-auto sm:flex-1 sm:min-w-52">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text3" />
               <input
                 type="text"

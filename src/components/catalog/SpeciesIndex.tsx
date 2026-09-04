@@ -15,6 +15,9 @@ import SpeciesHoverPreview, {
   type SpeciesHoverPreviewHandle,
 } from "./SpeciesHoverPreview";
 
+const GRID_COLS =
+  "md:grid md:grid-cols-[5.5rem_minmax(0,1.4fr)_minmax(0,1fr)_9rem_3rem] md:gap-4 md:items-baseline";
+
 const SORT_KEYS: SortKey[] = [
   "family",
   "catalogNum",
@@ -69,7 +72,7 @@ export default function SpeciesIndex({
             key={key}
             onClick={() => setSort(key)}
             aria-pressed={sort === key}
-            className={`border px-3 py-1.5 font-mono text-caption uppercase tracking-widest transition-colors duration-300 ${
+            className={`border px-3 py-2.5 md:py-1.5 font-mono text-caption uppercase tracking-widest transition-colors duration-300 ${
               sort === key
                 ? "border-gold text-gold"
                 : "border-border text-text3 hover:border-border-2 hover:text-text1"
@@ -93,13 +96,13 @@ export default function SpeciesIndex({
           filtros habría que cuadrar tres alturas a mano, y cualquier cambio de
           padding vuelve a solaparlas. Con la familia repetida en cada fila, el
           encabezado no hace falta a media tabla. */}
-      <div className="border-y border-border">
-        <div className="container-site grid grid-cols-[5.5rem_1fr] md:grid-cols-[5.5rem_minmax(0,1.4fr)_minmax(0,1fr)_9rem_3rem] gap-4 py-2.5 font-mono text-caption uppercase tracking-widest text-text3">
+      <div className="hidden md:block border-y border-border">
+        <div className={`container-site ${GRID_COLS} py-2.5 font-mono text-caption uppercase tracking-widest text-text3`}>
           <span>{t("col_catalog")}</span>
           <span>{t("col_species")}</span>
-          <span className="hidden md:block">{t("col_common")}</span>
-          <span className="hidden md:block">{t("col_family")}</span>
-          <span className="hidden md:block text-right">{t("col_status")}</span>
+          <span>{t("col_common")}</span>
+          <span>{t("col_family")}</span>
+          <span className="text-right">{t("col_status")}</span>
         </div>
       </div>
 
@@ -134,28 +137,33 @@ export default function SpeciesIndex({
                 onMouseLeave={() => previewRef.current?.hide()}
                 className="group block border-b border-border/60 hover:bg-surface transition-colors duration-300"
               >
-                <div className="container-site grid grid-cols-[5.5rem_1fr] md:grid-cols-[5.5rem_minmax(0,1.4fr)_minmax(0,1fr)_9rem_3rem] gap-4 items-baseline py-3">
-                  <span className="catalog-number group-hover:text-gold-dim transition-colors duration-300">
-                    {s.catalogNum ?? "—"}
-                  </span>
+                <div className={`container-site py-3.5 md:py-3 ${GRID_COLS}`}>
+                  {/* Móvil: número y estado comparten línea. En md, `contents`
+                      disuelve este envoltorio y cada celda va a su columna. */}
+                  <div className="flex items-center justify-between gap-3 md:contents">
+                    <span className="catalog-number md:col-start-1 md:row-start-1 group-hover:text-gold-dim transition-colors duration-300">
+                      {s.catalogNum ?? "—"}
+                    </span>
+                    <span
+                      className={`font-mono text-caption px-2 py-0.5 md:col-start-5 md:row-start-1 md:justify-self-end ${status.color} ${status.bg}`}
+                      title={status.label}
+                    >
+                      {s.conservationStatus}
+                    </span>
+                  </div>
 
-                  <span className="font-mono text-mono-sm italic text-gold truncate">
+                  <span className="mt-2 block md:mt-0 md:col-start-2 md:row-start-1 font-mono text-mono-sm italic text-gold truncate">
                     {s.scientificName}
                   </span>
 
-                  <span className="hidden md:block font-sans text-body-md text-text2 group-hover:text-text1 transition-colors duration-300 truncate">
+                  <span className="mt-0.5 block md:mt-0 md:col-start-3 md:row-start-1 font-sans text-body-md text-text2 group-hover:text-text1 transition-colors duration-300 truncate">
                     {commonName(s)}
                   </span>
 
-                  <span className="hidden md:block font-mono text-caption text-text3 truncate">
+                  {/* La familia solo en escritorio: en móvil ya la dice el
+                      encabezado del grupo y competiría por un ancho escaso. */}
+                  <span className="hidden md:block md:col-start-4 md:row-start-1 font-mono text-caption text-text3 truncate">
                     {s.family}
-                  </span>
-
-                  <span
-                    className={`hidden md:block justify-self-end font-mono text-caption px-2 py-0.5 ${status.color} ${status.bg}`}
-                    title={status.label}
-                  >
-                    {s.conservationStatus}
                   </span>
                 </div>
               </Link>
