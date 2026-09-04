@@ -48,13 +48,13 @@ export default function SectionRule({ label, value }: Props) {
 
   return (
     <div ref={ref} className="container-site">
-      <div className="flex items-center gap-6">
-        <span className="section-rule-text font-mono text-caption uppercase tracking-widest text-text3 shrink-0">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-6">
+        <span className="section-rule-text font-mono text-caption uppercase tracking-widest text-text3 sm:shrink-0">
           {label}
         </span>
-        <span className="section-rule-line h-px flex-1 origin-left bg-border" />
+        <span className="section-rule-line h-px w-full origin-left bg-border sm:flex-1" />
         {value && (
-          <span className="section-rule-text font-mono text-caption uppercase tracking-widest text-gold shrink-0 tabular-nums">
+          <span className="section-rule-text font-mono text-caption uppercase tracking-widest text-gold tabular-nums sm:shrink-0">
             {value}
           </span>
         )}

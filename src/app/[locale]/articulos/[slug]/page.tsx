@@ -266,7 +266,7 @@ export default async function ArticleDetailPage({
       {related.length > 0 && (
         <section className="border-t border-border">
           <div className="container-site py-20">
-            <div className="flex items-center justify-between mb-12 gap-8">
+            <div className="flex flex-col items-start gap-4 mb-12 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
               <div>
                 <p className="font-mono text-caption text-text3 uppercase tracking-widest mb-2">
                   {t("continue")}

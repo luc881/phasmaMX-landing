@@ -102,7 +102,7 @@ export default function PhasmidsIntro() {
             </blockquote>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-8">
+            <div className="grid grid-cols-3 gap-4 sm:gap-8">
               {STATS.map((stat) => (
                 <div key={stat.key} className="stat-item">
                   <p className="font-display text-display-md font-light text-gold-dim mb-1">

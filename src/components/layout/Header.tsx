@@ -88,10 +88,19 @@ export default function Header({ locale }: Props) {
   const progressTone = onPaper ? "bg-gold" : "bg-gold-ink";
   const trackTone = onPaper ? "bg-text1/20" : "bg-ink-2/20";
 
+  /*
+   * Tres detalles de la barra que solo se notan en móvil:
+   * - `inset-x-0` en vez de `left-0 right-0`: mismo efecto, menos superficie.
+   * - `transition-colors` y no `transition-all`: `all` animaba también el
+   *   `backdrop-filter`, que en Chromium móvil parpadea o desaparece al hacer
+   *   scroll. Solo el color necesita transición.
+   * - `transform-gpu` promueve la barra a su propia capa; sin ella el
+   *   `backdrop-filter` sobre un elemento fijo se repinta mal en Android.
+   */
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-600 ${glass} ${barTone}`}
+        className={`fixed inset-x-0 top-0 z-50 transform-gpu transition-colors duration-600 ${glass} ${barTone}`}
       >
         <div className="container-site">
           <div className="flex items-center justify-between h-16 lg:h-20 gap-4">

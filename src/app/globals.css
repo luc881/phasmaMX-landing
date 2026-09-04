@@ -35,6 +35,13 @@
   }
 
   html {
+    /* `overflow-x: hidden` en `body` era la contención anterior, y es la causa
+       de que el header fijo se despegue al hacer scroll en móvil: crea un
+       contenedor de scroll y los `position: fixed` dejan de anclarse al
+       viewport. `clip` contiene igual pero NO crea contenedor. La línea
+       `hidden` queda como respaldo para navegadores sin soporte de `clip`. */
+    overflow-x: hidden;
+    overflow-x: clip;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -45,7 +52,6 @@
     background-color: var(--color-void);
     color: var(--color-text-1);
     font-family: var(--font-dm-sans), system-ui, sans-serif;
-    overflow-x: hidden;
   }
 
   ::selection {
