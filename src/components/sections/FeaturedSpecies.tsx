@@ -55,7 +55,7 @@ export default function FeaturedSpecies({ species: allSpecies }: { species: Spec
     <section
       id="featured-species"
       ref={sectionRef}
-      className="py-24 lg:py-36"
+      className="py-16 md:py-24 lg:py-36"
     >
       <div className="container-site">
         {/* Section header */}

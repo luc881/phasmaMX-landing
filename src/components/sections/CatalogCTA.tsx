@@ -37,7 +37,7 @@ export default function CatalogCTA() {
     <section
       ref={sectionRef}
       data-surface="paper"
-      className="surface-paper py-24 lg:py-36"
+      className="surface-paper py-16 md:py-24 lg:py-36"
     >
       <div className="container-site">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 bg-paper-2 border border-paper-border overflow-hidden">

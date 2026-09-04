@@ -54,7 +54,7 @@ export default function DistributionMap() {
   return (
     <section
       ref={sectionRef}
-      className="py-24 lg:py-36"
+      className="py-16 md:py-24 lg:py-36"
     >
       <div className="container-site">
         {/* Header */}

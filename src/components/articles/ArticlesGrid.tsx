@@ -61,7 +61,7 @@ export default function ArticlesGrid({ articles }: { articles: ArticleCard[] }) 
   return (
     <div>
       {/* ── Category filter tabs ── */}
-      <div ref={filterRef} className="border-b border-border sticky top-16 z-30 bg-void/95 backdrop-blur-sm">
+      <div ref={filterRef} className="border-b border-border sticky top-16 lg:top-20 z-30 bg-void/95 backdrop-blur-sm">
         <div className="container-site">
           <div className="flex gap-0 overflow-x-auto scrollbar-none">
             {CATEGORIES.map((cat) => (

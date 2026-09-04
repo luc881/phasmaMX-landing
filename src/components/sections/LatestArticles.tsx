@@ -52,7 +52,7 @@ export default function LatestArticles({ articles: latestArticles }: { articles:
   const [featured, ...rest] = articles;
 
   return (
-    <section ref={sectionRef} className="py-24 lg:py-36">
+    <section ref={sectionRef} className="py-16 md:py-24 lg:py-36">
       <div className="container-site">
         {/* Header */}
         <div className="article-reveal flex items-end justify-between mb-16 gap-8">

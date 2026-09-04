@@ -72,7 +72,7 @@ export default function PhasmidsIntro() {
       id="phasmids-intro"
       ref={sectionRef}
       data-surface="paper"
-      className="surface-paper py-24 lg:py-36"
+      className="surface-paper py-16 md:py-24 lg:py-36"
     >
       <div className="container-site">
         {/* Label */}

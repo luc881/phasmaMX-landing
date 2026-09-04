@@ -110,7 +110,15 @@
   /* Imagen specimen full-bleed */
   .specimen-image {
     @apply relative overflow-hidden;
-    aspect-ratio: 2 / 3;
+    /* En móvil la tarjeta ocupa todo el ancho, y un 2/3 la deja en ~880px de
+       alto: más de una pantalla por especie. Apaisada cabe de sobra y encaja
+       con la orientación real de la mayoría de las fotografías. */
+    aspect-ratio: 4 / 3;
+  }
+  @media (min-width: 768px) {
+    .specimen-image {
+      aspect-ratio: 2 / 3;
+    }
   }
   .specimen-image img {
     @apply w-full h-full object-cover transition-transform duration-800;
