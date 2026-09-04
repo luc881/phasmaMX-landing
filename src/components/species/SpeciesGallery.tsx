@@ -117,11 +117,11 @@ export default function SpeciesGallery({ images }: { images: GalleryImage[] }) {
               />
             </div>
             {/* Caption */}
-            <div className="mt-4 flex items-start justify-between gap-4">
+            <div className="mt-4 flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
               <p className="font-mono text-caption text-text2 italic">
                 {images[activeIndex].caption}
               </p>
-              <p className="font-mono text-caption text-text3 shrink-0">
+              <p className="font-mono text-caption text-text3 sm:shrink-0">
                 {images[activeIndex].credit}
               </p>
             </div>

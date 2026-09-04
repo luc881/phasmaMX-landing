@@ -131,7 +131,7 @@ export default function Hero() {
           </p>
 
           {/* CTAs */}
-          <div ref={ctaRef} className="flex items-center gap-6 opacity-0" style={{ opacity: 1 }}>
+          <div ref={ctaRef} className="flex flex-wrap items-center gap-3 sm:gap-6 opacity-0" style={{ opacity: 1 }}>
             <Link href="/especies" className="btn-primary">
               {t("hero.cta")}
             </Link>
@@ -145,7 +145,7 @@ export default function Hero() {
       {/* Indicador de scroll */}
       <button
         onClick={scrollToContent}
-        className="absolute bottom-8 right-8 lg:right-16 flex flex-col items-center gap-2 text-text3 hover:text-gold transition-colors duration-400 z-10"
+        className="absolute bottom-8 right-8 lg:right-16 hidden md:flex flex-col items-center gap-2 text-text3 hover:text-gold transition-colors duration-400 z-10"
         aria-label="Desplazar hacia abajo"
       >
         <span className="font-mono text-caption uppercase tracking-widest rotate-90 mb-2">

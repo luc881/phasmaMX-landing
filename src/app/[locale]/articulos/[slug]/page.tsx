@@ -177,20 +177,20 @@ export default async function ArticleDetailPage({
 
               {/* Article metadata */}
               <div className="border border-border bg-surface divide-y divide-border">
-                <div className="flex justify-between px-6 py-3">
+                <div className="flex justify-between gap-4 px-6 py-3">
                   <span className="font-mono text-caption text-text3 uppercase tracking-wide">{t("category_label")}</span>
                   <span className={`font-mono text-caption ${meta.color}`}>
                     {tArticles(meta.translationKey as Parameters<typeof tArticles>[0])}
                   </span>
                 </div>
-                <div className="flex justify-between px-6 py-3">
+                <div className="flex justify-between gap-4 px-6 py-3">
                   <span className="font-mono text-caption text-text3 uppercase tracking-wide flex items-center gap-2">
                     <Calendar size={11} />
                     {t("published_label")}
                   </span>
                   <span className="font-sans text-body-md text-text2">{formatDate(article.publishedAt, locale)}</span>
                 </div>
-                <div className="flex justify-between px-6 py-3">
+                <div className="flex justify-between gap-4 px-6 py-3">
                   <span className="font-mono text-caption text-text3 uppercase tracking-wide flex items-center gap-2">
                     <Clock size={11} />
                     {t("reading_label")}

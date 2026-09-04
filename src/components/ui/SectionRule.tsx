@@ -52,6 +52,7 @@ export default function SectionRule({ label, value }: Props) {
         <span className="section-rule-text font-mono text-caption uppercase tracking-widest text-text3 sm:shrink-0">
           {label}
         </span>
+        <span aria-hidden className="section-rule-text hidden h-1.5 w-1.5 rotate-45 border border-gold-dim sm:block sm:shrink-0" />
         <span className="section-rule-line h-px w-full origin-left bg-border sm:flex-1" />
         {value && (
           <span className="section-rule-text font-mono text-caption uppercase tracking-widest text-gold tabular-nums sm:shrink-0">

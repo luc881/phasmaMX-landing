@@ -78,27 +78,32 @@ export default function LatestArticles({ articles: latestArticles }: { articles:
           {/* Featured article */}
           <Link
             href={`/articulos/${featured.slug}`}
-            className="article-reveal lg:col-span-7 group relative overflow-hidden bg-void"
-            style={{ aspectRatio: "4/3" }}
+            className="article-reveal lg:col-span-7 group relative overflow-hidden bg-void flex flex-col lg:block lg:aspect-[4/3]"
           >
-            {featured.image ? (
-              <Image
-                src={featured.image}
-                alt={featured.title}
-                fill
-                className="object-cover transition-transform duration-800 group-hover:scale-[1.03]"
-                style={{ transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36,1)" }}
-                sizes="(max-width: 1024px) 100vw, 60vw"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-surface flex items-center justify-center">
-                <span className="font-mono text-caption text-text3 uppercase tracking-widest">
-                  Sin fotografía
-                </span>
-              </div>
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-void via-void/40 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-8">
+            {/* En móvil la tarjeta ocupa el ancho completo y el titular, la
+                entradilla y la firma no caben encima de la foto: van debajo, en
+                flujo normal. Desde lg vuelven a superponerse sobre el degradado. */}
+            <div className="relative w-full aspect-[4/3] lg:absolute lg:inset-0 lg:aspect-auto">
+              {featured.image ? (
+                <Image
+                  src={featured.image}
+                  alt={featured.title}
+                  fill
+                  className="object-cover transition-transform duration-800 group-hover:scale-[1.03]"
+                  style={{ transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36,1)" }}
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-surface flex items-center justify-center">
+                  <span className="font-mono text-caption text-text3 uppercase tracking-widest">
+                    Sin fotografía
+                  </span>
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-void via-void/40 to-transparent hidden lg:block" />
+            </div>
+
+            <div className="relative p-6 pb-7 lg:absolute lg:bottom-0 lg:left-0 lg:right-0 lg:p-8">
               <p
                 className={`font-mono text-caption uppercase tracking-widest mb-3 ${
                   CATEGORY_META[featured.category as ArticleCategory]?.color ?? "text-text2"

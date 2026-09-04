@@ -8,6 +8,7 @@ import DistributionMap from "@/components/sections/DistributionMap";
 import CatalogCTA from "@/components/sections/CatalogCTA";
 import SectionRule from "@/components/ui/SectionRule";
 import TaxonMarquee from "@/components/ui/TaxonMarquee";
+import Ornament from "@/components/ui/Ornament";
 import { getFeaturedSpecies, getSpeciesCatalog } from "@/lib/content/species";
 import { getArticlesIndex, getLatestArticles } from "@/lib/content/articles";
 import { formatDate } from "@/lib/placeholder/articles";
@@ -83,6 +84,9 @@ export default async function HomePage({ params }: Props) {
       />
 
       <DistributionMap />
+
+      <Ornament className="container-site py-12 md:py-16" />
+
       <CatalogCTA />
     </>
   );

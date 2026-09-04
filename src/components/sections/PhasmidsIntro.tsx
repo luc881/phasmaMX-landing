@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import CountUp from "@/components/ui/CountUp";
+import Ornament from "@/components/ui/Ornament";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -101,6 +102,8 @@ export default function PhasmidsIntro() {
               con las plantas que los rodean — arquitectura viva.
             </blockquote>
 
+            <Ornament tone="paper" className="intro-reveal mb-8 md:mb-12" />
+
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 sm:gap-8">
               {STATS.map((stat) => (
@@ -135,13 +138,13 @@ export default function PhasmidsIntro() {
             </div>
 
             {/* Caption científico */}
-            <div className="mt-4 flex items-start justify-between">
+            <div className="mt-4 flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
               {/* El pie describía una especie que la foto no muestra: es una
                   imagen de hábitat, no de espécimen. */}
-              <p className="font-mono text-caption text-ink-3 italic max-w-xs">
+              <p className="font-mono text-caption text-ink-3 italic sm:max-w-xs">
                 Dosel tropical húmedo — hábitat típico de Phasmatodea
               </p>
-              <p className="font-mono text-caption text-ink-3 shrink-0">
+              <p className="font-mono text-caption text-ink-3 sm:shrink-0">
                 © Placeholder
               </p>
             </div>
