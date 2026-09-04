@@ -59,7 +59,7 @@ export default function FeaturedSpecies({ species: allSpecies }: { species: Spec
     >
       <div className="container-site">
         {/* Section header */}
-        <div ref={titleRef} className="flex items-end justify-between mb-16 gap-8">
+        <div ref={titleRef} className="flex items-end justify-between mb-8 md:mb-16 gap-8">
           <div>
             <p className="font-mono text-caption text-text3 uppercase tracking-widest mb-3">
               {t("featured_species.label")}
@@ -89,6 +89,11 @@ export default function FeaturedSpecies({ species: allSpecies }: { species: Spec
               index={index}
               locale={locale}
               viewLabel={t("species_card.view")}
+              /* De la cuarta en adelante, solo en pantallas anchas: a ancho
+                 completo cada tarjeta ocupa media pantalla, y seis seguidas
+                 convierten la sección en cuatro pantallas de scroll. El
+                 enlace al catálogo completo ya cubre el resto. */
+              className={index >= 3 ? "hidden md:flex" : undefined}
             />
           ))}
         </div>
@@ -109,11 +114,13 @@ function SpecimenCard({
   index,
   locale,
   viewLabel,
+  className,
 }: {
   species: Species;
   index: number;
   locale: string;
   viewLabel: string;
+  className?: string;
 }) {
   // El inglés casi nunca está cargado todavía: cae al español antes que dejar hueco.
   const commonName =
@@ -124,7 +131,7 @@ function SpecimenCard({
   return (
     <Link
       href={`/especies/${species.slug}`}
-      className="specimen-card group relative flex flex-col bg-void overflow-hidden"
+      className={`specimen-card group relative flex flex-col bg-void overflow-hidden ${className ?? ""}`}
     >
       {/* Full-bleed image */}
       <div className="specimen-image w-full">

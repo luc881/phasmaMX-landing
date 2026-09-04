@@ -55,7 +55,7 @@ export default function LatestArticles({ articles: latestArticles }: { articles:
     <section ref={sectionRef} className="py-16 md:py-24 lg:py-36">
       <div className="container-site">
         {/* Header */}
-        <div className="article-reveal flex items-end justify-between mb-16 gap-8">
+        <div className="article-reveal flex items-end justify-between mb-8 md:mb-16 gap-8">
           <div>
             <p className="font-mono text-caption text-text3 uppercase tracking-widest mb-3">
               {t("latest_articles.label")}

@@ -58,7 +58,7 @@ export default function DistributionMap() {
     >
       <div className="container-site">
         {/* Header */}
-        <div className="map-reveal mb-16">
+        <div className="map-reveal mb-8 md:mb-16">
           <p className="font-mono text-caption text-text3 uppercase tracking-widest mb-3">
             México · Registros de campo
           </p>
@@ -150,7 +150,9 @@ export default function DistributionMap() {
               {MEXICO_STATES_WITH_RECORDS.map((state, i) => (
                 <div
                   key={state.name}
-                  className="state-dot flex items-center gap-4 py-3 border-b border-border last:border-b-0"
+                  className={`state-dot flex items-center gap-4 py-2.5 md:py-3 border-b border-border last:border-b-0 ${
+                    i >= 7 ? "hidden md:flex" : ""
+                  }`}
                 >
                   <span className="font-mono text-caption text-text3 w-6 shrink-0">
                     {String(i + 1).padStart(2, "0")}

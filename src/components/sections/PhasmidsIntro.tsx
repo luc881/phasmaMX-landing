@@ -76,27 +76,27 @@ export default function PhasmidsIntro() {
     >
       <div className="container-site">
         {/* Label */}
-        <p className="intro-reveal font-mono text-caption text-ink-3 uppercase tracking-widest mb-16">
+        <p className="intro-reveal font-mono text-caption text-ink-3 uppercase tracking-widest mb-8 md:mb-16">
           Phasmatodea · Biología &amp; Ecología
         </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-16 lg:gap-24 items-start">
           {/* Texto editorial */}
           <div className="lg:col-span-6">
-            <h2 className="intro-reveal font-display text-display-md font-light text-void mb-8">
+            <h2 className="intro-reveal font-display text-display-md font-light text-void mb-6 md:mb-8">
               {t("intro_title")}
             </h2>
 
-            <p className="intro-reveal font-sans text-body-lg text-ink-2 leading-relaxed mb-6">
+            <p className="intro-reveal font-sans text-body-md md:text-body-lg text-ink-2 leading-relaxed mb-6">
               {t("intro_body")}
             </p>
 
-            <p className="intro-reveal font-sans text-body-md text-ink-2 leading-relaxed mb-12">
+            <p className="intro-reveal font-sans text-body-md text-ink-2 leading-relaxed mb-8 md:mb-12">
               {t("intro_body_2")}
             </p>
 
             {/* Pull quote */}
-            <blockquote className="intro-reveal pull-quote text-void border-l-gold-dim mb-12">
+            <blockquote className="intro-reveal pull-quote text-void border-l-gold-dim mb-8 md:mb-12">
               Los fásmidos son el resultado de millones de años de coevolución
               con las plantas que los rodean — arquitectura viva.
             </blockquote>
